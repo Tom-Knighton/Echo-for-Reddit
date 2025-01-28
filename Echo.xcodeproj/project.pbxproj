@@ -6,14 +6,52 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E2FEE0992D4839AB00462DDF /* Env in Frameworks */ = {isa = PBXBuildFile; productRef = E2FEE0982D4839AB00462DDF /* Env */; };
+		E2FEE09B2D4839C200462DDF /* Design in Frameworks */ = {isa = PBXBuildFile; productRef = E2FEE09A2D4839C200462DDF /* Design */; };
+		E2FEE09E2D48537D00462DDF /* Onboarding in Frameworks */ = {isa = PBXBuildFile; productRef = E2FEE09D2D48537D00462DDF /* Onboarding */; };
+		E2FEE0AC2D494CBC00462DDF /* API in Frameworks */ = {isa = PBXBuildFile; productRef = E2FEE0AB2D494CBC00462DDF /* API */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E2E408CC2D48348F00E59156 /* Echo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Echo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E2E408E02D4835DB00E59156 /* Exceptions for "Packages" folder in "Echo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				API,
+				Design,
+				Env,
+				Onboarding,
+			);
+			target = E2E408CB2D48348F00E59156 /* Echo */;
+		};
+		E2FEE0AA2D494B2C00462DDF /* Exceptions for "Echo" folder in "Echo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E2E408CB2D48348F00E59156 /* Echo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E2E408CE2D48348F00E59156 /* Echo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E2FEE0AA2D494B2C00462DDF /* Exceptions for "Echo" folder in "Echo" target */,
+			);
 			path = Echo;
+			sourceTree = "<group>";
+		};
+		E2E408DE2D48350700E59156 /* Packages */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E2E408E02D4835DB00E59156 /* Exceptions for "Packages" folder in "Echo" target */,
+			);
+			path = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +61,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2FEE09B2D4839C200462DDF /* Design in Frameworks */,
+				E2FEE0AC2D494CBC00462DDF /* API in Frameworks */,
+				E2FEE0992D4839AB00462DDF /* Env in Frameworks */,
+				E2FEE09E2D48537D00462DDF /* Onboarding in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +75,8 @@
 			isa = PBXGroup;
 			children = (
 				E2E408CE2D48348F00E59156 /* Echo */,
+				E2E408DE2D48350700E59156 /* Packages */,
+				E2FEE0972D4839AB00462DDF /* Frameworks */,
 				E2E408CD2D48348F00E59156 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +87,13 @@
 				E2E408CC2D48348F00E59156 /* Echo.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E2FEE0972D4839AB00462DDF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -62,9 +113,14 @@
 			);
 			fileSystemSynchronizedGroups = (
 				E2E408CE2D48348F00E59156 /* Echo */,
+				E2E408DE2D48350700E59156 /* Packages */,
 			);
 			name = Echo;
 			packageProductDependencies = (
+				E2FEE0982D4839AB00462DDF /* Env */,
+				E2FEE09A2D4839C200462DDF /* Design */,
+				E2FEE09D2D48537D00462DDF /* Onboarding */,
+				E2FEE0AB2D494CBC00462DDF /* API */,
 			);
 			productName = Echo;
 			productReference = E2E408CC2D48348F00E59156 /* Echo.app */;
@@ -252,6 +308,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Echo/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -291,6 +348,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Echo/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -339,6 +397,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E2FEE0982D4839AB00462DDF /* Env */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Env;
+		};
+		E2FEE09A2D4839C200462DDF /* Design */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Design;
+		};
+		E2FEE09D2D48537D00462DDF /* Onboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Onboarding;
+		};
+		E2FEE0AB2D494CBC00462DDF /* API */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = API;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E2E408C42D48348F00E59156 /* Project object */;
 }

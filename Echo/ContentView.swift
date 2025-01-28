@@ -6,16 +6,19 @@
 //
 
 import SwiftUI
+import Onboarding
+import API
 
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text("Logged In")
+            Button(action: { Task {
+                await AuthManager().logout()
+            }}) {
+                Text("Log Out")
+            }
         }
-        .padding()
     }
 }
 
