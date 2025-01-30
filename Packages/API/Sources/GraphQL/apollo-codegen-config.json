@@ -1,0 +1,44 @@
+{
+    "schemaNamespace" : "EchoAPI",
+    "schemaDownload": {
+        "downloadMethod": {
+            "introspection": {
+                "endpointURL": "https://localhost:7276/graphql",
+                "httpMethod": {
+                    "POST": {}
+                },
+                "includeDeprecatedInputValues": false,
+                "outputFormat": "SDL"
+            }
+        },
+        "downloadTimeout": 60,
+        "headers": [],
+        "outputPath": "./schema.graphqls"
+    },
+    "input" : {
+        "operationSearchPaths" : [
+            "**/*.graphql"
+        ],
+        "schemaSearchPaths" : [
+            "**/*.graphqls"
+        ]
+    },
+    "output" : {
+        "testMocks" : {
+            "none" : {
+            }
+        },
+        "schemaTypes" : {
+            "path" : "./EchoAPI",
+            "moduleType" : {
+                "embeddedInTarget" : {
+                    "name" : "API"
+                }
+            }
+        },
+        "operations" : {
+            "inSchemaModule" : {
+            }
+        }
+    }
+}

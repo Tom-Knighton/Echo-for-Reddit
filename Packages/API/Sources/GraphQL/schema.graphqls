@@ -1,0 +1,387 @@
+"""
+The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response.
+"""
+directive @cost(
+  """
+  The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc.
+  """
+  weight: String!
+) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
+
+"""
+The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information.
+"""
+directive @listSize(
+  """
+  The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field.
+  """
+  assumedSize: Int
+
+  """
+  The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments.
+  """
+  slicingArguments: [String!]
+
+  """
+  The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query.
+  """
+  slicingArgumentDefaultValue: Int
+
+  """
+  The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields.
+  """
+  sizedFields: [String!]
+
+  """
+  The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error.
+  """
+  requireOneSlicingArgument: Boolean! = true
+) on FIELD_DEFINITION
+
+"""
+A directive used by the Apollo iOS client to annotate operations or fragments that should be used exclusively for generating local cache mutations instead of as standard operations.
+"""
+directive @apollo_client_ios_localCacheMutation on QUERY | MUTATION | SUBSCRIPTION | FRAGMENT_DEFINITION
+
+"""
+A directive used by the Apollo iOS code generation engine to generate custom import statements in operation or fragment definition files. An import statement to import a module with the name provided in the `module` argument will be added to the generated definition file.
+"""
+directive @import(
+  """The name of the module to import."""
+  module: String!
+) repeatable on QUERY | MUTATION | SUBSCRIPTION | FRAGMENT_DEFINITION
+
+"""Attach extra information to a given type."""
+directive @typePolicy(
+  """
+  A selection set containing fields used to compute the cache key of an object. Referenced fields must have non-nullable scalar types. Order is important.
+  """
+  keyFields: String!
+) on OBJECT | INTERFACE
+
+"""
+Directs the executor to defer this fragment when the `if` argument is true or undefined.
+"""
+directive @defer(
+  """Deferred when true or undefined."""
+  if: Boolean
+
+  """Unique name"""
+  label: String
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+type SubredditDto {
+  subredditId: String!
+  subredditName: String!
+  subredditTitle: String!
+  subredditIconUrl: String
+  userIsBanned: Boolean!
+  subredditSubscriberCount: Int!
+  subredditIsNSFW: Boolean!
+  subredditTagline: String!
+  subredditDescription: String!
+  userIsSubscribed: Boolean!
+  subredditCreatedUtc: DateTime!
+  posts(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    sort: RedditSortOption!
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+  ): PostsConnection
+}
+
+type PostComment {
+  commentId: String!
+  commentAuthor: String!
+  commentAuthorFlair: String
+  commentScore: Int
+  commentText: String!
+  commentCreatedAt: DateTime!
+  commentEditedAt: DateTime
+  voteStatus: VoteStatus!
+  commentFlagDetails: PostFlagDetails!
+  replies: [PostComment!]!
+  loadMoreLink: LoadMoreLink
+  media: [PostMedia!]!
+}
+
+"""An edge in a connection."""
+type AllEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: PostDto!
+}
+
+"""A connection to a list of items."""
+type PopularConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PopularEdge!]
+
+  """A flattened list of the nodes."""
+  nodes: [PostDto!]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+type PostFlagDetails {
+  isNSFW: Boolean!
+  isSaved: Boolean!
+  isLocked: Boolean!
+  isStickied: Boolean!
+  isArchived: Boolean!
+  isSpoiler: Boolean!
+  distinguishmentType: DistinguishmentType!
+}
+
+type PostMedia {
+  url: String!
+  thumbnailUrl: String
+  height: Float!
+  width: Float!
+  type: PostContentType
+  hlsDashUrl: String
+  mediaText: String
+  isInline: Boolean!
+}
+
+enum RedditSortOption {
+  HOT
+  NEW
+  RISING
+  TOP
+  TOP_DAILY
+  TOP_WEEKLY
+  TOP_MONTHLY
+  TOP_YEARLY
+  TOP_ALL
+  CONTROVERSIAL
+  CONTROVERSIAL_DAILY
+  CONTROVERSIAL_WEEKLY
+  CONTROVERSIAL_MONTHLY
+  CONTROVERSIAL_YEARLY
+  CONTROVERSIAL_ALL
+  BEST
+  Q_AND_A
+}
+
+type PostDto {
+  postId: String!
+  postAuthor: String!
+  postAuthorFlair: String
+  postSubreddit: String!
+  postTitle: String!
+  postScore: Int!
+  postScorePercentage: Int!
+  postCommentCount: Int!
+  postCreatedAt: DateTime!
+  postEditedAt: DateTime
+  subredditIcon: String
+  postFlagDetails: PostFlagDetails!
+  postContent: PostContent!
+  postVoteStatus: VoteStatus
+  postFlair: String
+  postRecommendedSort: RedditSortOption!
+  comments(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    sort: RedditSortOption!
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+  ): CommentsConnection
+}
+
+"""A connection to a list of items."""
+type CommentsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [CommentsEdge!]
+
+  """A flattened list of the nodes."""
+  nodes: [PostComment!]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+type Query {
+  reddit: RedditQuery!
+}
+
+type LoadMoreLink {
+  parentId: String!
+  moreCount: Int!
+  moreChildren: [String!]!
+  isContinueThreadLink: Boolean!
+}
+
+enum VoteStatus {
+  UPVOTED
+  DOWNVOTED
+  NO_VOTE
+}
+
+"""An edge in a connection."""
+type CommentsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: PostComment!
+}
+
+"""A connection to a list of items."""
+type PostsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PostsEdge!]
+
+  """A flattened list of the nodes."""
+  nodes: [PostDto!]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type PostsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: PostDto!
+}
+
+type PostContent {
+  contentType: PostContentType!
+  textContent: String
+  media: [PostMedia!]!
+}
+
+"""An edge in a connection."""
+type PopularEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: PostDto!
+}
+
+type RedditQuery {
+  all(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    sort: RedditSortOption!
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+  ): AllConnection
+  popular(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    sort: RedditSortOption!
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+  ): PopularConnection
+  subreddit(subredditName: String!): SubredditDto!
+  subscribed: [SubredditDto!]!
+  post(postId: String!): PostDto!
+}
+
+"""A connection to a list of items."""
+type AllConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [AllEdge!]
+
+  """A flattened list of the nodes."""
+  nodes: [PostDto!]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+enum PostContentType {
+  TEXT_ONLY
+  IMAGE
+  VIDEO
+  GIF
+  LINK_ONLY
+  MEDIA_GALLERY
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """
+  Indicates whether more edges exist following the set defined by the clients arguments.
+  """
+  hasNextPage: Boolean!
+
+  """
+  Indicates whether more edges exist prior the set defined by the clients arguments.
+  """
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""The `DateTime` scalar represents an ISO-8601 compliant date time type."""
+scalar DateTime
+
+enum DistinguishmentType {
+  MODERATOR
+  ADMIN
+  SPECIAL
+  NONE
+}
