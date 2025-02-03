@@ -4,8 +4,9 @@
 import ApolloAPI
 
 public extension EchoAPI.Objects {
-  static let SubredditDto = ApolloAPI.Object(
-    typename: "SubredditDto",
+  /// A connection to a list of items.
+  static let OverviewConnection = ApolloAPI.Object(
+    typename: "OverviewConnection",
     implementedInterfaces: [],
     keyFields: nil
   )

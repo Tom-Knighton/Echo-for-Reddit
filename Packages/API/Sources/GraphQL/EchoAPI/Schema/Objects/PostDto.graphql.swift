@@ -4,8 +4,8 @@
 import ApolloAPI
 
 public extension EchoAPI.Objects {
-  static let SubredditDto = ApolloAPI.Object(
-    typename: "SubredditDto",
+  static let PostDto = ApolloAPI.Object(
+    typename: "PostDto",
     implementedInterfaces: [],
     keyFields: nil
   )

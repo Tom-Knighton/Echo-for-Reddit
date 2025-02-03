@@ -1,0 +1,44 @@
+fragment UserFragment on UserDto {
+    id
+            name
+            iconImageUrl
+            totalKarma
+            postKarma
+            commentKarma
+            createdAt
+            description
+            userSubreddit {
+                subredditTitle
+                subredditIsNSFW
+                bannerImageUrl
+            }
+            overview(first: 25, sort: NEW) {
+                edges {
+                    node {
+                        ... on PostComment {
+                            commentId
+                            commentText
+                            commentScore
+                            commentCreatedAt
+                            voteStatus
+                            commentFlagDetails {
+                                isNSFW
+                                isSaved
+                                isLocked
+                                isArchived
+                                isArchived
+                                isSpoiler
+                                distinguishmentType
+                            }
+                        }
+                        
+                        ... on PostDto {
+                            postId
+                            postTitle
+                            postCreatedAt
+                            postCommentCount
+                        }
+                    }
+                }
+            }
+}

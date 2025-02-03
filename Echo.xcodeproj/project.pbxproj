@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E25A9F912D4EDD090007C53B /* User in Frameworks */ = {isa = PBXBuildFile; productRef = E25A9F902D4EDD090007C53B /* User */; };
 		E2FEE0992D4839AB00462DDF /* Env in Frameworks */ = {isa = PBXBuildFile; productRef = E2FEE0982D4839AB00462DDF /* Env */; };
 		E2FEE09B2D4839C200462DDF /* Design in Frameworks */ = {isa = PBXBuildFile; productRef = E2FEE09A2D4839C200462DDF /* Design */; };
 		E2FEE09E2D48537D00462DDF /* Onboarding in Frameworks */ = {isa = PBXBuildFile; productRef = E2FEE09D2D48537D00462DDF /* Onboarding */; };
@@ -25,6 +26,7 @@
 				Design,
 				Env,
 				Onboarding,
+				UserFeature,
 			);
 			target = E2E408CB2D48348F00E59156 /* Echo */;
 		};
@@ -63,6 +65,7 @@
 			files = (
 				E2FEE09B2D4839C200462DDF /* Design in Frameworks */,
 				E2FEE0AC2D494CBC00462DDF /* API in Frameworks */,
+				E25A9F912D4EDD090007C53B /* User in Frameworks */,
 				E2FEE0992D4839AB00462DDF /* Env in Frameworks */,
 				E2FEE09E2D48537D00462DDF /* Onboarding in Frameworks */,
 			);
@@ -121,6 +124,7 @@
 				E2FEE09A2D4839C200462DDF /* Design */,
 				E2FEE09D2D48537D00462DDF /* Onboarding */,
 				E2FEE0AB2D494CBC00462DDF /* API */,
+				E25A9F902D4EDD090007C53B /* User */,
 			);
 			productName = Echo;
 			productReference = E2E408CC2D48348F00E59156 /* Echo.app */;
@@ -399,6 +403,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E25A9F902D4EDD090007C53B /* User */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = User;
+		};
 		E2FEE0982D4839AB00462DDF /* Env */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Env;

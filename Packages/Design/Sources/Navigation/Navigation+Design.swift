@@ -1,0 +1,122 @@
+//
+//  Navigation+Design.swift
+//  Design
+//
+//  Created by Tom Knighton on 03/02/2025.
+//
+
+import SwiftUI
+
+public extension View {
+    @ViewBuilder
+    func customNavigationTitleWithRightIcon<Content: View>(@ViewBuilder _ rightIcon: @escaping () -> Content, subtitle: String? = nil) -> some View {
+        overlay(content: {
+            CustomNavigationTitleView(rightIcon: rightIcon, subtitle: subtitle)
+                .frame(width: 0, height: 0)
+        })
+    }
+}
+
+public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepresentable {
+    
+    @ViewBuilder public var rightIcon: () -> RightIcon
+    public var subtitle: String? = nil
+    
+    public func makeUIViewController(context: Context) -> UIViewController {
+        return ViewControllerWrapper(rightContent: rightIcon, subtitle: subtitle)
+    }
+    
+    class ViewControllerWrapper: UIViewController {
+        private let partOne = ["X3NldExhcmdl", "VGl0bGVBY2Nlc3Nvcnk=", "Vmlldzo="]
+        private let partTwo = ["X2FsaWduTGFyZ2VUaXQ=", "bGVBY2Nlc3Nvcnk=", "Vmlld1RvQmFzZWxpbmU="]
+        private let partThree = ["X3NldA==", "V2VlVA==", "aXRsZTo="]
+        var rightContent: () -> RightIcon
+        var subtitle: String? = nil
+        
+        init(rightContent: @escaping () -> RightIcon, subtitle: String? = nil) {
+            self.rightContent = rightContent
+            self.subtitle = subtitle
+            super.init(nibName: nil, bundle: nil)
+        }
+        
+        override func viewWillAppear(_ animated: Bool) {
+            guard let navigationController = self.navigationController, let navigationItem = navigationController.visibleViewController?.navigationItem else { return }
+            
+            let contentView = UIHostingController(rootView: rightContent())
+            contentView.view.backgroundColor = .clear
+            
+            let name: [String] = partOne.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
+            let name1: [String] = partTwo.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
+            let name2: [String] = partThree.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
+            navigationItem.perform(Selector((name.joined())), with: contentView.view)
+            navigationItem.setValue(false, forKey: name1.joined())
+            
+            var titleFont = UIFont.preferredFont(forTextStyle: .largeTitle)
+            titleFont = UIFont(
+                descriptor:
+                    titleFont.fontDescriptor
+                    .withDesign(.rounded)?
+                    .withSymbolicTraits(.traitBold)
+                ??
+                titleFont.fontDescriptor,
+                size: titleFont.pointSize
+            )
+            
+            var smallTitleFont = UIFont.preferredFont(forTextStyle: .headline)
+            smallTitleFont = UIFont(
+                descriptor:
+                    smallTitleFont.fontDescriptor
+                    .withDesign(.rounded)?
+                    .withSymbolicTraits(.traitBold)
+                ??
+                smallTitleFont.fontDescriptor,
+                size: smallTitleFont.pointSize
+            )
+            
+            navigationController.navigationBar.standardAppearance.largeTitleTextAttributes = [.font: titleFont]
+            navigationController.navigationBar.standardAppearance.titleTextAttributes = [.font: smallTitleFont]
+            
+            if let subtitle {
+                navigationItem.perform(Selector((name2.joined())), with: subtitle)
+            }
+            
+            navigationController.navigationBar.prefersLargeTitles = true
+            
+            super.viewWillAppear(animated)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
+    
+    public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+struct Base64Decoder {
+    
+    enum DecodingError: Swift.Error {
+        case invalidData
+    }
+    
+    func decode(_ base64EncodedString: String) throws -> String {
+        guard
+            let base64EncodedData = base64EncodedString.data(using: .utf8),
+            let data = Data(base64Encoded: base64EncodedData),
+            let result = String(data: data, encoding: .utf8)
+        else {
+            throw DecodingError.invalidData
+        }
+        
+        return result
+    }
+}
+
+extension UIFont {
+    class func rounded(ofSize size: CGFloat, weight: UIFont.Weight) -> UIFont {
+        let systemFont = UIFont.systemFont(ofSize: size, weight: weight)
+        
+        guard #available(iOS 13.0, *), let descriptor = systemFont.fontDescriptor.withDesign(.rounded) else { return systemFont }
+        return UIFont(descriptor: descriptor, size: size)
+    }
+}

@@ -82,6 +82,7 @@ type SubredditDto {
   subredditDescription: String!
   userIsSubscribed: Boolean!
   subredditCreatedUtc: DateTime!
+  bannerImageUrl: String
   posts(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -102,6 +103,7 @@ type SubredditDto {
 
 type PostComment {
   commentId: String!
+  cursorId: String!
   commentAuthor: String!
   commentAuthorFlair: String
   commentScore: Int
@@ -122,6 +124,15 @@ type AllEdge {
 
   """The item at the end of the edge."""
   node: PostDto!
+}
+
+"""An edge in a connection."""
+type OverviewEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: RedditThing!
 }
 
 """A connection to a list of items."""
@@ -182,6 +193,7 @@ enum RedditSortOption {
 
 type PostDto {
   postId: String!
+  cursorId: String!
   postAuthor: String!
   postAuthorFlair: String
   postSubreddit: String!
@@ -241,6 +253,69 @@ type LoadMoreLink {
   isContinueThreadLink: Boolean!
 }
 
+union RedditThing = PostComment | PostDto
+
+type UserDto {
+  id: String!
+  iconImageUrl: String!
+  name: String!
+  description: String
+  totalKarma: Int!
+  postKarma: Int!
+  commentKarma: Int!
+  createdAt: DateTime!
+  userSubredditId: String!
+  userSubreddit: SubredditDto!
+  overview(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    sort: RedditSortOption!
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+  ): OverviewConnection
+  posts(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    sort: RedditSortOption!
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+  ): PostsConnection
+  comments(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    sort: RedditSortOption!
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+  ): CommentsConnection
+}
+
 enum VoteStatus {
   UPVOTED
   DOWNVOTED
@@ -266,6 +341,21 @@ type PostsConnection {
 
   """A flattened list of the nodes."""
   nodes: [PostDto!]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""A connection to a list of items."""
+type OverviewConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [OverviewEdge!]
+
+  """A flattened list of the nodes."""
+  nodes: [RedditThing!]
 
   """Identifies the total count of items in the connection."""
   totalCount: Int!
@@ -331,6 +421,8 @@ type RedditQuery {
   subreddit(subredditName: String!): SubredditDto!
   subscribed: [SubredditDto!]!
   post(postId: String!): PostDto!
+  user(userId: String!): UserDto!
+  me: UserDto!
 }
 
 """A connection to a list of items."""

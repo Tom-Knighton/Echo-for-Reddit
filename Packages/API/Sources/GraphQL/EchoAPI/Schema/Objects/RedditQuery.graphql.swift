@@ -3,7 +3,7 @@
 
 import ApolloAPI
 
-extension EchoAPI.Objects {
+public extension EchoAPI.Objects {
   static let RedditQuery = ApolloAPI.Object(
     typename: "RedditQuery",
     implementedInterfaces: [],

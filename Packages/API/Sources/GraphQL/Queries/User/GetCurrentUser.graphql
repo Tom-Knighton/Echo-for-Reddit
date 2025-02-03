@@ -1,0 +1,7 @@
+query GetCurrentUser {
+    reddit {
+        me {
+            ...UserFragment
+        }
+    }
+}

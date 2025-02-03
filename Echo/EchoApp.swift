@@ -24,7 +24,7 @@ struct EchoApp: App {
                     ProgressView()
                         .progressViewStyle(.circular)
                 } else if isLoggedIn {
-                    ContentView()
+                    RootView()
                 } else {
                     LoginView()
                 }
@@ -46,8 +46,9 @@ struct EchoApp: App {
     
     private func doLoginWork() async {
         let authManager = AuthManager()
-        if let _ = try? await authManager.validToken() {
+        if let token = try? await authManager.validToken() {
             isLoggedIn = true
+            print(token)
         }
         
         isLoading = false

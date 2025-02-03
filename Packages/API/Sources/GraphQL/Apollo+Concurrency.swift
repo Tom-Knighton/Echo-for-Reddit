@@ -11,12 +11,13 @@ extension ApolloClient {
     
     public func fetch<Query: GraphQLQuery>(query: Query) async throws -> GraphQLResult<Query.Data>{
         try await withCheckedThrowingContinuation { continuation in
-            self.fetch(query: query, cachePolicy: .returnCacheDataDontFetch) { result in
+            self.fetch(query: query, cachePolicy: .returnCacheDataElseFetch) { result in
                 switch result {
                 case .success(let data):
                     continuation.resume(returning: data)
                     break
                 case .failure(let error):
+                    print(error)
                     continuation.resume(throwing: error)
                     break
                 }

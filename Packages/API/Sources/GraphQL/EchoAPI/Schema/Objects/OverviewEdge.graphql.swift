@@ -4,8 +4,9 @@
 import ApolloAPI
 
 public extension EchoAPI.Objects {
-  static let SubredditDto = ApolloAPI.Object(
-    typename: "SubredditDto",
+  /// An edge in a connection.
+  static let OverviewEdge = ApolloAPI.Object(
+    typename: "OverviewEdge",
     implementedInterfaces: [],
     keyFields: nil
   )

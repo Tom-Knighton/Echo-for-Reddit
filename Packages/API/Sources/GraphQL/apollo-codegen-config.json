@@ -32,7 +32,8 @@
             "path" : "./EchoAPI",
             "moduleType" : {
                 "embeddedInTarget" : {
-                    "name" : "API"
+                    "name" : "API",
+                    "accessModifier": "public"
                 }
             }
         },
