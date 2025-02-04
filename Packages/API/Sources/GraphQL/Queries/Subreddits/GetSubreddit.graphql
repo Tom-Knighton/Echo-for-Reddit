@@ -1,0 +1,7 @@
+query GetSubreddit($name: String!) {
+    reddit {
+        subreddit(subredditName: $name) {
+            ...SubredditFragment
+        }
+    }
+}

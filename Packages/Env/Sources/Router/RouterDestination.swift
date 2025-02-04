@@ -7,4 +7,6 @@
 
 public enum RouterDestination: Hashable {
     case profile(username: String)
+    case subreddits
+    case subreddit(subredditName: String)
 }

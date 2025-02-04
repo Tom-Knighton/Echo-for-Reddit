@@ -1,0 +1,13 @@
+fragment SubredditFragment on SubredditDto {
+    subredditId
+    subredditName
+    subredditTitle
+    subredditIconUrl
+    userIsBanned
+    subredditSubscriberCount
+    subredditIsNSFW
+    subredditTagline
+    subredditDescription
+    userIsSubscribed
+    bannerImageUrl
+}

@@ -21,6 +21,7 @@ struct AppTabRootView: View {
         GeometryReader { _ in
             NavigationStack(path: $router[tab]) {
                 tab.rootView
+                    .withEchoRoutes()
             }
         }
         .ignoresSafeArea()
@@ -33,7 +34,7 @@ extension AppTab {
     fileprivate var rootView: some View {
         switch self {
         case .posts:
-            SubredditListPage()
+            SubredditPage(subredditName: "UKPolitics")
         case .search:
             Text("TODO")
         case .profile:

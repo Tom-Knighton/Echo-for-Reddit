@@ -23,8 +23,11 @@ struct UserStatsView: View {
                         image
                             .resizable()
                             .scaledToFill()
-                            .frame(maxWidth: .infinity, maxHeight: 384, alignment: .top)
+                            .frame(maxWidth: .infinity, minHeight: 122, maxHeight: 122, alignment: .top)
                             .clipShape(.rect(cornerRadius: 10))
+                            .overlay(GeometryReader { reader in
+                                Text("\(reader.size.height)")
+                            })
                         
                     default:
                         shim()
@@ -50,7 +53,8 @@ struct UserStatsView: View {
     private func shim() -> some View {
         Rectangle()
             .fill(theme.layer2)
-            .frame(maxWidth: .infinity, maxHeight: 384)
+            .frame(maxWidth: .infinity, minHeight: 122,
+                   maxHeight: 122)
             .clipShape(.rect(cornerRadius: 10))
             .shadow(radius: 3)
     }
