@@ -8,7 +8,8 @@ public extension EchoAPI {
     public static let operationName: String = "GetSubscribedSubreddits"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query GetSubscribedSubreddits { reddit { __typename subscribed { __typename subredditId } } }"#
+        #"query GetSubscribedSubreddits { reddit { __typename subscribed { __typename ...SubscribedSubredditFragment } } }"#,
+        fragments: [SubscribedSubredditFragment.self]
       ))
 
     public init() {}
@@ -49,10 +50,19 @@ public extension EchoAPI {
           public static var __parentType: any ApolloAPI.ParentType { EchoAPI.Objects.SubredditDto }
           public static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("subredditId", String.self),
+            .fragment(SubscribedSubredditFragment.self),
           ] }
 
           public var subredditId: String { __data["subredditId"] }
+          public var subredditTitle: String { __data["subredditTitle"] }
+          public var subredditIconUrl: String? { __data["subredditIconUrl"] }
+
+          public struct Fragments: FragmentContainer {
+            public let __data: DataDict
+            public init(_dataDict: DataDict) { __data = _dataDict }
+
+            public var subscribedSubredditFragment: SubscribedSubredditFragment { _toFragment() }
+          }
         }
       }
     }

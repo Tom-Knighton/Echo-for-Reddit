@@ -8,6 +8,7 @@
 import SwiftUI
 import Env
 import User
+import Subreddits
 
 struct AppTabRootView: View {
     @Environment(Router.self) private var router
@@ -32,7 +33,7 @@ extension AppTab {
     fileprivate var rootView: some View {
         switch self {
         case .posts:
-            Text("TODO")
+            SubredditListPage()
         case .search:
             Text("TODO")
         case .profile:

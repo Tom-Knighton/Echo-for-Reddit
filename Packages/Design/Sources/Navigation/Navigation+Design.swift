@@ -8,8 +8,17 @@
 import SwiftUI
 
 public extension View {
+    
     @ViewBuilder
-    func customNavigationTitleWithRightIcon<Content: View>(@ViewBuilder _ rightIcon: @escaping () -> Content, subtitle: String? = nil) -> some View {
+    func customNavigation(subtitle: String? = nil) -> some View {
+        overlay(content: {
+            CustomNavigationTitleView<EmptyView>(subtitle: subtitle)
+                .frame(width: 0, height: 0)
+        })
+    }
+    
+    @ViewBuilder
+    func customNavigation<Content: View>(@ViewBuilder with rightIcon: @escaping () -> Content, subtitle: String? = nil) -> some View {
         overlay(content: {
             CustomNavigationTitleView(rightIcon: rightIcon, subtitle: subtitle)
                 .frame(width: 0, height: 0)
@@ -19,8 +28,13 @@ public extension View {
 
 public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepresentable {
     
-    @ViewBuilder public var rightIcon: () -> RightIcon
+    public var rightIcon: (() -> RightIcon)? = nil
     public var subtitle: String? = nil
+    
+    public init(rightIcon: (() -> RightIcon)? = nil, subtitle: String? = nil) {
+        self.rightIcon = rightIcon
+        self.subtitle = subtitle
+    }
     
     public func makeUIViewController(context: Context) -> UIViewController {
         return ViewControllerWrapper(rightContent: rightIcon, subtitle: subtitle)
@@ -30,10 +44,10 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         private let partOne = ["X3NldExhcmdl", "VGl0bGVBY2Nlc3Nvcnk=", "Vmlldzo="]
         private let partTwo = ["X2FsaWduTGFyZ2VUaXQ=", "bGVBY2Nlc3Nvcnk=", "Vmlld1RvQmFzZWxpbmU="]
         private let partThree = ["X3NldA==", "V2VlVA==", "aXRsZTo="]
-        var rightContent: () -> RightIcon
+        var rightContent: (() -> RightIcon)?
         var subtitle: String? = nil
         
-        init(rightContent: @escaping () -> RightIcon, subtitle: String? = nil) {
+        init(rightContent: (() -> RightIcon)? = nil, subtitle: String? = nil) {
             self.rightContent = rightContent
             self.subtitle = subtitle
             super.init(nibName: nil, bundle: nil)
@@ -42,14 +56,19 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         override func viewWillAppear(_ animated: Bool) {
             guard let navigationController = self.navigationController, let navigationItem = navigationController.visibleViewController?.navigationItem else { return }
             
-            let contentView = UIHostingController(rootView: rightContent())
-            contentView.view.backgroundColor = .clear
             
-            let name: [String] = partOne.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
-            let name1: [String] = partTwo.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
+            if let rightContent {
+                let contentView = UIHostingController(rootView: rightContent())
+                contentView.view.backgroundColor = .clear
+                
+                let name: [String] = partOne.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
+                navigationItem.perform(Selector((name.joined())), with: contentView.view)
+                
+                let name1: [String] = partTwo.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
+                navigationItem.setValue(false, forKey: name1.joined())
+            }
+            
             let name2: [String] = partThree.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
-            navigationItem.perform(Selector((name.joined())), with: contentView.view)
-            navigationItem.setValue(false, forKey: name1.joined())
             
             var titleFont = UIFont.preferredFont(forTextStyle: .largeTitle)
             titleFont = UIFont(

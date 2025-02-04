@@ -52,7 +52,7 @@ public struct UserPageView: View {
                 .padding(.horizontal, 16)
             }
             .navigationTitle(getUserTitle(for: user))
-            .customNavigationTitleWithRightIcon({
+            .customNavigation(with: {
                 if let avatarURL = URL(string: user.iconImageUrl) {
                     AsyncImage(url: avatarURL) { phase in
                         switch phase {
