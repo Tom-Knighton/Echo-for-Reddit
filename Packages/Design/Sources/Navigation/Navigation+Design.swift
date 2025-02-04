@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreImage.CIFilterBuiltins
 
 public extension View {
     
@@ -24,20 +25,30 @@ public extension View {
                 .frame(width: 0, height: 0)
         })
     }
+    
+    @ViewBuilder
+    func customNavigation<Content: View>(@ViewBuilder with rightIcon: @escaping () -> Content, backgroundUrl: String? = nil, subtitle: String? = nil) -> some View {
+        overlay(content: {
+            CustomNavigationTitleView(rightIcon: rightIcon, backgroundUrl: backgroundUrl, subtitle: subtitle)
+                .frame(width: 0, height: 0)
+        })
+    }
 }
 
 public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepresentable {
     
     public var rightIcon: (() -> RightIcon)? = nil
     public var subtitle: String? = nil
+    public var backgroundUrl: String? = nil
     
-    public init(rightIcon: (() -> RightIcon)? = nil, subtitle: String? = nil) {
+    public init(rightIcon: (() -> RightIcon)? = nil, backgroundUrl: String? = nil, subtitle: String? = nil) {
         self.rightIcon = rightIcon
         self.subtitle = subtitle
+        self.backgroundUrl = backgroundUrl
     }
     
     public func makeUIViewController(context: Context) -> UIViewController {
-        return ViewControllerWrapper(rightContent: rightIcon, subtitle: subtitle)
+        return ViewControllerWrapper(rightContent: rightIcon, backgroundUrl: backgroundUrl, subtitle: subtitle)
     }
     
     class ViewControllerWrapper: UIViewController {
@@ -46,16 +57,17 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         private let partThree = ["X3NldA==", "V2VlVA==", "aXRsZTo="]
         var rightContent: (() -> RightIcon)?
         var subtitle: String? = nil
+        var backgroundUrl: String? = nil
         
-        init(rightContent: (() -> RightIcon)? = nil, subtitle: String? = nil) {
+        init(rightContent: (() -> RightIcon)? = nil, backgroundUrl: String? = nil, subtitle: String? = nil) {
             self.rightContent = rightContent
             self.subtitle = subtitle
+            self.backgroundUrl = backgroundUrl
             super.init(nibName: nil, bundle: nil)
         }
         
         override func viewWillAppear(_ animated: Bool) {
             guard let navigationController = self.navigationController, let navigationItem = navigationController.visibleViewController?.navigationItem else { return }
-            
             
             if let rightContent {
                 let contentView = UIHostingController(rootView: rightContent())
@@ -94,7 +106,24 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
             
             navigationController.navigationBar.standardAppearance.largeTitleTextAttributes = [.font: titleFont]
             navigationController.navigationBar.standardAppearance.titleTextAttributes = [.font: smallTitleFont]
+            let coloredNavAppearance = UINavigationBarAppearance()
             
+            
+            if let backgroundUrl, let url = URL(string: backgroundUrl) {
+                Task {
+                    let image = try? await ImageLoader.shared.loadImage(from: url)
+                    if let image {
+                        coloredNavAppearance.configureWithOpaqueBackground()
+                        coloredNavAppearance.backgroundImage = image
+                        coloredNavAppearance.backgroundImageContentMode = .scaleAspectFill
+                        let color = image.bestTextColor ?? UIColor.label
+                        coloredNavAppearance.largeTitleTextAttributes = [.foregroundColor: color, .font: titleFont]
+                        navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
+
+                    }
+                }
+            }
+           
             if let subtitle {
                 navigationItem.perform(Selector((name2.joined())), with: subtitle)
             }
@@ -137,5 +166,31 @@ extension UIFont {
         
         guard #available(iOS 13.0, *), let descriptor = systemFont.fontDescriptor.withDesign(.rounded) else { return systemFont }
         return UIFont(descriptor: descriptor, size: size)
+    }
+}
+
+
+actor ImageLoader {
+    static let shared = ImageLoader()
+    private let cache = NSCache<NSURL, UIImage>()
+
+    func loadImage(from url: URL) async throws -> UIImage {
+        if let cachedImage = cache.object(forKey: url as NSURL) {
+            return cachedImage
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        guard let image = UIImage(data: data) else {
+            throw URLError(.cannotDecodeContentData)
+        }
+        
+        cache.setObject(image, forKey: url as NSURL)
+        return image
     }
 }
