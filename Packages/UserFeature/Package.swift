@@ -20,6 +20,7 @@ let package = Package(
         .package(path: "API"),
         .package(path: "Env"),
         .package(path: "Design"),
+        .package(path: "Models"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -33,8 +34,8 @@ let package = Package(
                 ),
                 "API",
                 "Env",
-                "Design"
+                "Design",
+                "Models"
             ]),
-        
     ]
 )

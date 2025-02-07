@@ -6,17 +6,18 @@
 //
 
 import SwiftUI
-import API
+import Models
 import Env
 
 struct UserStatsView: View {
     
     @Environment(\.theme) private var theme
-    let user: EchoAPI.UserFragment
+    let user: User
+    let userSubreddit: UserSubreddit
     
     public var body: some View {
         ZStack {
-            if let banner = user.userSubreddit.bannerImageUrl, let bannerURL = URL(string: banner) {
+            if let banner = userSubreddit.bannerImageUrl, let bannerURL = URL(string: banner) {
                 AsyncImage(url: bannerURL) { phase in
                     switch phase {
                     case .success(let image):

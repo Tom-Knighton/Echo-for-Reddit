@@ -17,9 +17,12 @@ let package = Package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
             from: "1.0.0"
         ),
+        .package(url: "https://github.com/siteline/swiftui-introspect", from: "1.0.0"),
         .package(path: "API"),
+        .package(path: "Models"),
         .package(path: "Env"),
-        .package(path: "Design"),
+        .package(path: "Posts"),
+        .package(path: "Design")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -31,10 +34,12 @@ let package = Package(
                     name: "ComposableArchitecture",
                     package: "swift-composable-architecture"
                 ),
+                .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
                 "API",
                 "Env",
-                "Design"
+                "Posts",
+                "Design",
+                "Models",
             ]),
-        
     ]
 )

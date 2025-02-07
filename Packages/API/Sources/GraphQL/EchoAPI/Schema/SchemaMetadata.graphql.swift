@@ -32,8 +32,12 @@ public extension EchoAPI {
       case "OverviewConnection": return EchoAPI.Objects.OverviewConnection
       case "OverviewEdge": return EchoAPI.Objects.OverviewEdge
       case "PostComment": return EchoAPI.Objects.PostComment
+      case "PostContent": return EchoAPI.Objects.PostContent
       case "PostDto": return EchoAPI.Objects.PostDto
       case "PostFlagDetails": return EchoAPI.Objects.PostFlagDetails
+      case "PostMedia": return EchoAPI.Objects.PostMedia
+      case "PostsConnection": return EchoAPI.Objects.PostsConnection
+      case "PostsEdge": return EchoAPI.Objects.PostsEdge
       case "Query": return EchoAPI.Objects.Query
       case "RedditQuery": return EchoAPI.Objects.RedditQuery
       case "SubredditDto": return EchoAPI.Objects.SubredditDto

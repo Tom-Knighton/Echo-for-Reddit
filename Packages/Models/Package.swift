@@ -4,27 +4,20 @@
 import PackageDescription
 
 let package = Package(
-    name: "API",
+    name: "Models",
     platforms: [.iOS(.v18)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "API",
-            targets: ["API"]),
+            name: "Models",
+            targets: ["Models"]),
     ],
-    dependencies: [
-        .package(url: "https://github.com/OAuthSwift/OAuthSwift.git", .upToNextMajor(from: "2.2.0")),
-        .package(
-            url: "https://github.com/apollographql/apollo-ios.git",
-            .upToNextMajor(from: "1.0.0")
-        ),
-        .package(path: "Env")
-    ],
+    dependencies: [.package(path: "API")],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "API",
-            dependencies: ["OAuthSwift", .product(name: "Apollo", package: "apollo-ios"), "Env"]),
+            name: "Models", dependencies: ["API"]),
+
     ]
 )

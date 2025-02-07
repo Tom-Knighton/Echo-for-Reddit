@@ -8,6 +8,9 @@
 import SwiftUI
 import Env
 import ComposableArchitecture
+import Posts
+import Models
+import SwiftUIIntrospect
 
 public struct SubredditPage: View {
     
@@ -40,15 +43,24 @@ public struct SubredditPage: View {
         }
     }
     
+    @State private var search: String = ""
+    
     @ViewBuilder
-    private func subredditView(for subreddit: SubredditData) -> some View {
+    private func subredditView(for subreddit: Subreddit) -> some View {
         List {
-            Text("row")
-            Text("row")
-            Text("row")
-            Text("row")
+            Color.clear
+                .frame(height: 3)
+                .listRowInsets(.init())
+                .listRowBackground(theme.primaryBackground)
+                .listRowSeparator(.hidden)
+            ForEach(store.posts) { post in
+                ListPostView(with: post)
+            }
         }
+        .searchable(text: $search)
+        .environment(\.defaultMinListRowHeight, 3)
         .listStyle(.plain)
+        .listRowSpacing(12)
         .scrollContentBackground(.hidden)
         .navigationTitle(subreddit.subredditTitle)
         .customNavigation(with: {
@@ -69,5 +81,13 @@ public struct SubredditPage: View {
                 }
             }
         }, backgroundUrl: subreddit.bannerImageUrl)
+        .introspect(.searchField, on: .iOS(.v18), scope: .ancestor) { searchField in
+            searchField.searchTextField.textColor = UIColor(theme.labelColor)
+            searchField.searchTextField.leftView?.tintColor = .gray
+            if let textField = searchField.value(forKey: "searchField") as? UITextField {
+                let placeholder = textField.value(forKey: "placeholderLabel") as? UILabel
+                placeholder?.textColor = .gray
+            }
+        }
     }
 }

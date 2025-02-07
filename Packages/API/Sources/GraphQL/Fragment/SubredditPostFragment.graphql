@@ -1,0 +1,35 @@
+fragment SubredditPostFragment on PostDto {
+    postId
+    cursorId
+    postAuthor
+    postFlair
+    postSubreddit
+    postTitle
+    postScore
+    postCommentCount
+    subredditIcon
+    postCreatedAt
+    postVoteStatus
+    postFlagDetails {
+        isNSFW
+        isSaved
+        isStickied
+        isSpoiler
+        isArchived
+        isLocked
+    }
+    postContent {
+        textContent
+        contentType
+        media {
+            url
+            isInline
+            thumbnailUrl
+            width
+            height
+            hlsDashUrl
+            type
+            mediaText
+        }
+    }
+}

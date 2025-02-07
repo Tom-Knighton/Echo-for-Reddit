@@ -47,11 +47,11 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         self.backgroundUrl = backgroundUrl
     }
     
-    public func makeUIViewController(context: Context) -> UIViewController {
+    public func makeUIViewController(context: Context) -> ViewControllerWrapper {
         return ViewControllerWrapper(rightContent: rightIcon, backgroundUrl: backgroundUrl, subtitle: subtitle)
     }
     
-    class ViewControllerWrapper: UIViewController {
+    public class ViewControllerWrapper: UIViewController {
         private let partOne = ["X3NldExhcmdl", "VGl0bGVBY2Nlc3Nvcnk=", "Vmlldzo="]
         private let partTwo = ["X2FsaWduTGFyZ2VUaXQ=", "bGVBY2Nlc3Nvcnk=", "Vmlld1RvQmFzZWxpbmU="]
         private let partThree = ["X3NldA==", "V2VlVA==", "aXRsZTo="]
@@ -66,7 +66,7 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
             super.init(nibName: nil, bundle: nil)
         }
         
-        override func viewWillAppear(_ animated: Bool) {
+        override public func viewWillAppear(_ animated: Bool) {
             guard let navigationController = self.navigationController, let navigationItem = navigationController.visibleViewController?.navigationItem else { return }
             
             if let rightContent {
@@ -119,11 +119,10 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
                         let color = image.bestTextColor ?? UIColor.label
                         coloredNavAppearance.largeTitleTextAttributes = [.foregroundColor: color, .font: titleFont]
                         navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
-
                     }
                 }
             }
-           
+            
             if let subtitle {
                 navigationItem.perform(Selector((name2.joined())), with: subtitle)
             }
@@ -133,12 +132,30 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
             super.viewWillAppear(animated)
         }
         
+        
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
+        
+        public func checkColours() {
+            guard let navigationController = self.navigationController, let navigationItem = navigationController.visibleViewController?.navigationItem else { return }
+//            UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).textColor = .red
+
+//            if let image = navigationController.navigationBar.scrollEdgeAppearance?.backgroundImage {
+//                let color = image.bestTextColor
+//                if let search = navigationItem.searchController {
+//                    search.searchBar.searchTextField.textColor = .red
+//                    search.searchBar.searchTextField.tintColor = .red
+//                }
+//            }
+
+        }
     }
     
-    public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+    
+    public func updateUIViewController(_ uiViewController: ViewControllerWrapper, context: Context) {
+        uiViewController.checkColours()
+    }
 }
 
 struct Base64Decoder {
@@ -173,7 +190,7 @@ extension UIFont {
 actor ImageLoader {
     static let shared = ImageLoader()
     private let cache = NSCache<NSURL, UIImage>()
-
+    
     func loadImage(from url: URL) async throws -> UIImage {
         if let cachedImage = cache.object(forKey: url as NSURL) {
             return cachedImage
@@ -192,5 +209,22 @@ actor ImageLoader {
         
         cache.setObject(image, forKey: url as NSURL)
         return image
+        
     }
 }
+
+extension UISearchBar {
+    func setPlaceholderColor(_ color: UIColor) {
+        if let textField = self.value(forKey: "searchField") as? UITextField {
+            let placeholder = textField.value(forKey: "placeholderLabel") as? UILabel
+            placeholder?.textColor = color
+        }
+    }
+    
+    func setTextColor(_ color: UIColor) {
+        if let textField = self.value(forKey: "searchField") as? UITextField {
+            textField.defaultTextAttributes = [.foregroundColor: UIColor.red]
+        }
+    }
+}
+

@@ -1,0 +1,13 @@
+query GetSubredditPosts($after: String, $subredditName: String!, $sort: RedditSortOption!) {
+    reddit {
+        subreddit(subredditName: $subredditName) {
+            posts(first: 25, after: $after, sort: $sort) {
+                edges {
+                    node {
+                        ...SubredditPostFragment
+                    }
+                }
+            }
+        }
+    }
+}

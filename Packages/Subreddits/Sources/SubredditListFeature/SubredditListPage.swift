@@ -13,7 +13,7 @@ public struct SubredditListPage: View {
     
     @Environment(\.theme) private var theme
     let store = StoreOf<SubredditListFeature>(initialState: SubredditListFeature.State()) { SubredditListFeature() }
-    
+
     public init() {}
     
     public var body: some View {

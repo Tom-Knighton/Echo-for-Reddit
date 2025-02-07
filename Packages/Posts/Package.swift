@@ -4,27 +4,39 @@
 import PackageDescription
 
 let package = Package(
-    name: "API",
+    name: "Posts",
     platforms: [.iOS(.v18)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "API",
-            targets: ["API"]),
+            name: "Posts",
+            targets: ["Posts"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/OAuthSwift/OAuthSwift.git", .upToNextMajor(from: "2.2.0")),
         .package(
-            url: "https://github.com/apollographql/apollo-ios.git",
-            .upToNextMajor(from: "1.0.0")
+            url: "https://github.com/pointfreeco/swift-composable-architecture",
+            from: "1.0.0"
         ),
-        .package(path: "Env")
+        .package(path: "API"),
+        .package(path: "Env"),
+        .package(path: "Design"),
+        .package(path: "Models")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "API",
-            dependencies: ["OAuthSwift", .product(name: "Apollo", package: "apollo-ios"), "Env"]),
+            name: "Posts",
+            dependencies: [
+                .product(
+                    name: "ComposableArchitecture",
+                    package: "swift-composable-architecture"
+                ),
+                "API",
+                "Env",
+                "Design",
+                "Models"
+            ]),
+        
     ]
 )

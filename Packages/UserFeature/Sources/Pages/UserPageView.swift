@@ -8,7 +8,7 @@
 import SwiftUI
 import Design
 import Env
-import API
+import Models
 import ComposableArchitecture
 
 public struct UserPageView: View {
@@ -26,8 +26,8 @@ public struct UserPageView: View {
                 ProgressView()
             }
             
-            if let user = store.user {
-                userBio(user)
+            if let user = store.user, let subreddit = store.userSubreddit {
+                userBio(user, subreddit)
             }
             
             if let error = store.error {
@@ -40,18 +40,18 @@ public struct UserPageView: View {
     }
     
     @ViewBuilder
-    private func userBio(_ user: EchoAPI.UserFragment) -> some View {
+    private func userBio(_ user: User, _ subreddit: UserSubreddit) -> some View {
         ZStack {
             ScrollView {
                 VStack {
-                    UserStatsView(user: user)
+                    UserStatsView(user: user, userSubreddit: subreddit)
                     if let bio = user.description {
                         UserBioView(description: bio)
                     }
                 }
                 .padding(.horizontal, 16)
             }
-            .navigationTitle(getUserTitle(for: user))
+            .navigationTitle(getUserTitle(for: user, subreddit: subreddit))
             .customNavigation(with: {
                 if let avatarURL = URL(string: user.iconImageUrl) {
                     AsyncImage(url: avatarURL) { phase in
@@ -69,18 +69,18 @@ public struct UserPageView: View {
                         }
                     }
                 }
-            }, subtitle: getUserSubtitle(for: user))
+            }, subtitle: getUserSubtitle(for: user, with: subreddit))
         }
     }
     
-    private func getUserTitle(for user: EchoAPI.UserFragment) -> String {
-        let subredditIsEmpty = user.userSubreddit.subredditTitle.isEmpty
+    private func getUserTitle(for user: User, subreddit: UserSubreddit) -> String {
+        let subredditIsEmpty = subreddit.subredditTitle.isEmpty
         
-        return subredditIsEmpty ? user.name : user.userSubreddit.subredditTitle
+        return subredditIsEmpty ? user.name : subreddit.subredditTitle
     }
     
-    private func getUserSubtitle(for user: EchoAPI.UserFragment) -> String? {
-        if let subredditName = user.userSubreddit.subredditTitle.isEmpty ? nil : user.userSubreddit.subredditTitle {
+    private func getUserSubtitle(for user: User, with subreddit: UserSubreddit) -> String? {
+        if let subredditName = subreddit.subredditTitle.isEmpty ? nil : subreddit.subredditTitle {
             return subredditName != user.name ? "u/\(user.name)" : nil
         }
         
