@@ -38,7 +38,7 @@ extension UIImage {
         return brightness
     }
     
-    var bestTextColor: UIColor? {
+    public var bestTextColor: UIColor? {
         let threshold: CGFloat = 0.5
         
         if let brightness = averageBrightness {

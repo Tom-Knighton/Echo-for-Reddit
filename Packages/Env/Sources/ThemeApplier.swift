@@ -22,7 +22,7 @@ struct ThemeApplier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .tint(theme.tint)
-            .foregroundStyle(theme.labelColor)
+//            .foregroundStyle(theme.labelColor)
             .environment(\.theme, theme)
             .fontDesign(.rounded)
             .onChange(of: colourScheme, initial: true) { _, newVal in

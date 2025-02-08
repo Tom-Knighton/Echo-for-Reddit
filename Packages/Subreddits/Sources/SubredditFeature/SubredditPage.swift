@@ -7,10 +7,10 @@
 
 import SwiftUI
 import Env
+import Design
 import ComposableArchitecture
 import Posts
 import Models
-import SwiftUIIntrospect
 
 public struct SubredditPage: View {
     
@@ -21,7 +21,7 @@ public struct SubredditPage: View {
     public init(subredditName: String) {
         self.subredditName = subredditName
     }
-
+    
     public var body: some View {
         ZStack {
             theme.primaryBackground.ignoresSafeArea()
@@ -81,13 +81,5 @@ public struct SubredditPage: View {
                 }
             }
         }, backgroundUrl: subreddit.bannerImageUrl)
-        .introspect(.searchField, on: .iOS(.v18), scope: .ancestor) { searchField in
-            searchField.searchTextField.textColor = UIColor(theme.labelColor)
-            searchField.searchTextField.leftView?.tintColor = .gray
-            if let textField = searchField.value(forKey: "searchField") as? UITextField {
-                let placeholder = textField.value(forKey: "placeholderLabel") as? UILabel
-                placeholder?.textColor = .gray
-            }
-        }
     }
 }

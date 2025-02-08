@@ -17,7 +17,6 @@ let package = Package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
             from: "1.0.0"
         ),
-        .package(url: "https://github.com/siteline/swiftui-introspect", from: "1.0.0"),
         .package(path: "API"),
         .package(path: "Models"),
         .package(path: "Env"),
@@ -34,7 +33,6 @@ let package = Package(
                     name: "ComposableArchitecture",
                     package: "swift-composable-architecture"
                 ),
-                .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
                 "API",
                 "Env",
                 "Posts",

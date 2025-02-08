@@ -119,6 +119,12 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
                         let color = image.bestTextColor ?? UIColor.label
                         coloredNavAppearance.largeTitleTextAttributes = [.foregroundColor: color, .font: titleFont]
                         navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
+                        
+                        if let searchField = navigationItem.searchController {
+                            searchField.searchBar.setPlaceholderColor(.gray)
+                            searchField.searchBar.searchTextField.leftView?.tintColor = .gray
+                            searchField.searchBar.searchTextField.textColor = color
+                        }
                     }
                 }
             }
@@ -136,25 +142,11 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-        
-        public func checkColours() {
-            guard let navigationController = self.navigationController, let navigationItem = navigationController.visibleViewController?.navigationItem else { return }
-//            UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).textColor = .red
-
-//            if let image = navigationController.navigationBar.scrollEdgeAppearance?.backgroundImage {
-//                let color = image.bestTextColor
-//                if let search = navigationItem.searchController {
-//                    search.searchBar.searchTextField.textColor = .red
-//                    search.searchBar.searchTextField.tintColor = .red
-//                }
-//            }
-
-        }
+    
     }
     
     
     public func updateUIViewController(_ uiViewController: ViewControllerWrapper, context: Context) {
-        uiViewController.checkColours()
     }
 }
 

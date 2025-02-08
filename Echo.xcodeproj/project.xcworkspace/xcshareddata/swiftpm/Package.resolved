@@ -1,5 +1,5 @@
 {
-  "originHash" : "912e4fd369958634fb5dbe541d470d504986bca7150c2d3c13199066a2212851",
+  "originHash" : "5427cdbe8a98be8b7676cf0eaa5226835886400d2e16002fc9416eacd0f90ae6",
   "pins" : [
     {
       "identity" : "apollo-ios",
@@ -188,15 +188,6 @@
       "state" : {
         "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
         "version" : "1.5.0"
-      }
-    },
-    {
-      "identity" : "swiftui-introspect",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/siteline/swiftui-introspect",
-      "state" : {
-        "revision" : "807f73ce09a9b9723f12385e592b4e0aaebd3336",
-        "version" : "1.3.0"
       }
     },
     {
