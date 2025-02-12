@@ -9,5 +9,6 @@ import SwiftUI
 import Design
 
 public extension EnvironmentValues {
-    @Entry var theme: Theme = EchoLightTheme()
+    @Entry var theme: Theme = EchoLightTheme()    
+    @Entry var linkManager: LPMetadataManager = LPMetadataManager()
 }

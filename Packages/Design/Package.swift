@@ -12,11 +12,13 @@ let package = Package(
             name: "Design",
             targets: ["Design"]),
     ],
+    dependencies: [.package(url: "https://github.com/satoshi-takano/OpenGraph", .upToNextMajor(from: "1.6.0"))],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Design"),
+            name: "Design",
+            dependencies: [.product(name: "OpenGraph", package: "OpenGraph")]),
 
     ]
 )

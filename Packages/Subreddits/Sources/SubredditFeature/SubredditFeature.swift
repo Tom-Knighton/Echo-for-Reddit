@@ -9,6 +9,7 @@ import API
 import Foundation
 import ComposableArchitecture
 import Models
+import Combine
 
 @Reducer
 struct SubredditFeature {
@@ -29,19 +30,21 @@ struct SubredditFeature {
         case postsFetched(Result<[EchoAPI.GetSubredditPostsQuery.Data.Reddit.Subreddit.Posts.Edge.Node], Error>)
     }
     
+    struct DataSourceLoadMoreID: Hashable {}
+    
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .fetchInitialData(let subredditName):
-                return .run { send in
+                state.isLoading = true
+                return .run(operation: { send in
                     do {
                         let result = try await GQLClient().query(EchoAPI.GetSubredditQuery(name: subredditName))
                         await send(.initialDataLoaded(.success(result.reddit.subreddit)))
                     } catch (let error) {
                         await send(.initialDataLoaded(.failure(error)))
                     }
-                }
-                
+                })
             case .fetchNextPosts:
                 guard let subreddit = state.subredditData else {
                     state.error = "Failed loading posts: T1"
@@ -62,7 +65,7 @@ struct SubredditFeature {
                 state.error = nil
                 return .none
                 
-                // Responses
+            // Responses
             case .initialDataLoaded(.success(let data)):
                 state.subredditData = Subreddit(from: data)
                 state.isLoading = false
@@ -73,9 +76,12 @@ struct SubredditFeature {
                 state.isLoading = false
                 return .none
                 
-            case .postsFetched(.success(let posts)):
-                let postIds = state.posts.compactMap { $0.postId }
-                state.posts.append(contentsOf: posts.filter { postIds.contains($0.postId) == false }.compactMap { Post(from: $0) })
+            case .postsFetched(.success(let postNodes)):
+                let newPosts = postNodes.compactMap { Post(from: $0) }
+                let existingIDs = Set(state.posts.map { $0.postId })
+                let postsToAppend = newPosts.filter { !existingIDs.contains($0.postId) }
+                state.posts.append(contentsOf: postsToAppend)
+                
                 return .none
             case .postsFetched(.failure(let error)):
                 state.error = error.localizedDescription

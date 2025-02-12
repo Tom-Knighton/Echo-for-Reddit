@@ -1,5 +1,5 @@
 {
-  "originHash" : "5427cdbe8a98be8b7676cf0eaa5226835886400d2e16002fc9416eacd0f90ae6",
+  "originHash" : "0b969d9da13a6b60c4bed81b186a22b220dbede37538a16fb32eb83f45fbef46",
   "pins" : [
     {
       "identity" : "apollo-ios",
@@ -62,6 +62,15 @@
       "state" : {
         "revision" : "d85964b96dbce94df961f28b996187c835089903",
         "version" : "2.2.0"
+      }
+    },
+    {
+      "identity" : "opengraph",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/satoshi-takano/OpenGraph",
+      "state" : {
+        "revision" : "15fa71b31cf85695cf7035a077aaa624f679f53a",
+        "version" : "1.6.0"
       }
     },
     {

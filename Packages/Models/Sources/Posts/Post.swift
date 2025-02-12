@@ -7,8 +7,9 @@
 
 import Foundation
 import API
+@preconcurrency import LinkPresentation
 
-public struct Post: RedditThing {
+public final class Post: RedditThing, @unchecked Sendable {
     /// The unique Id, or name, of the post
     public let postId: String
     
@@ -60,6 +61,10 @@ public struct Post: RedditThing {
     /// How the post comments should be sorted by
     public let postRecommendedSort: RedditSortOption?
     
+    /// If the post contains a link, there may be some link metadata for presentation here
+    public var lpMetadata: LPLinkMetadata?
+    private let provider = LPMetadataProvider()
+    
     public init(postId: String, cursorId: String, postAuthor: String, postAuthorFlair: String?, postSubreddit: String, postTitle: String, postScore: Int, postScorePercentage: Int, postCommentCount: Int, postCreatedAt: Date, postEditedAt: Date?, subredditIcon: String?, postFlagDetails: PostFlagDetails, postContent: PostContent, postVoteStatus: VoteStatus?, postFlair: String?, postRecommendedSort: RedditSortOption) {
         self.postId = postId
         self.cursorId = cursorId
@@ -78,6 +83,7 @@ public struct Post: RedditThing {
         self.postVoteStatus = postVoteStatus
         self.postFlair = postFlair
         self.postRecommendedSort = postRecommendedSort
+        self.doAsyncWork()
     }
     
     public init(from post: EchoAPI.GetSubredditPostsQuery.Data.Reddit.Subreddit.Posts.Edge.Node) {
@@ -103,9 +109,33 @@ public struct Post: RedditThing {
         }
         self.postContent = .init(textContent: post.postContent.textContent, contentType: contentType ?? .textOnly, media: media)
         self.postVoteStatus = VoteStatus(rawValue: post.postVoteStatus?.rawValue ?? VoteStatus.noVote.rawValue)
+        self.doAsyncWork()
+    }
+    
+    private func doAsyncWork() {
+        Task.detached {
+            if self.postContent.contentType == .linkOnly, let url = URL(string: self.postContent.media.first?.url ?? "") {
+                do {
+                    let data = try await self.provider.startFetchingMetadata(for: url)
+                    self.lpMetadata = data
+                } catch (let error) {
+                    print(error)
+                }
+            }
+        }
     }
 }
 
-extension Post: Identifiable, Equatable, Sendable {
-    public var id: String { postId }
+extension Post: Identifiable, Equatable, Hashable {
+    public static func == (lhs: Post, rhs: Post) -> Bool {
+        lhs.postId == rhs.postId
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(postId)
+        hasher.combine(lpMetadata)
+    }
+    
+    
+    public var id: String { postId + (lpMetadata?.url?.absoluteString ?? "") }
 }

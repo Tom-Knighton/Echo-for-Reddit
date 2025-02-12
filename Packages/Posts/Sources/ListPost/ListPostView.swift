@@ -10,11 +10,18 @@ import SwiftUI
 import ComposableArchitecture
 import Models
 import Env
+@preconcurrency import OpenGraph
+@preconcurrency import LinkPresentation
 
 public struct ListPostView: View {
     
     @Environment(\.theme) private var theme
+    @Environment(\.linkManager) private var linkManager
+    @Environment(\.openURL) private var openURL
     let store: StoreOf<PostListFeature>
+    @State private var linkData: OpenGraphData? = nil
+    @State private var metadata: LPLinkMetadata? = nil
+    @State private var metadataFailed: Bool = false
     
     public init() {
         store = StoreOf<PostListFeature>(initialState: PostListFeature.State()) { PostListFeature() }
@@ -33,8 +40,6 @@ public struct ListPostView: View {
             
             if let post = store.post {
                 postView(for: post)
-            } else {
-                Text("no post")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,65 +55,64 @@ public struct ListPostView: View {
             Text(post.postTitle)
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
             
             if post.postContent.contentType == .textOnly, let textContent = post.postContent.textContent, !textContent.isEmpty {
-                Spacer().frame(height: 4)
-                Text(textContent.truncate(length: 150))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundStyle(theme.labelColor.secondary)
+                PostTextContent(textContent: textContent)
             }
             
-            postDetails(for: post)
+            if post.postContent.contentType == .linkOnly {
+                if let metadata {
+                    LinkView(metadata: metadata)
+                } else if metadataFailed {
+                    HStack {
+                        Image(systemName: "network")
+                        Divider()
+                        Text(post.postContent.media.first?.url ?? "Visit Link")
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(theme.layer3)
+                    .clipShape(.rect(cornerRadius: 10))
+                    .shadow(radius: 3)
+                    .onTapGesture {
+                        if linkData == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
+                            self.openURL(url)
+                        }
+                    }
+                } else {
+                    Rectangle()
+                        .fill(theme.layer3)
+                        .frame(height: 250)
+                        .clipShape(.rect(cornerRadius: 10))
+                        .redacted(reason: .placeholder)
+                        .onTapGesture {
+                            if linkData == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
+                                self.openURL(url)
+                            }
+                        }
+                }
+            }
+            
+            PostDetailsView(post: post)
+                .onAppear {
+                    print("SDDD \(post.postId)")
+                }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 12)
         .multilineTextAlignment(.leading)
-    }
-    
-    @ViewBuilder
-    private func postDetails(for post: Post) -> some View {
-        Spacer().frame(height: 6)
-        HStack {
-            VStack(alignment: .leading) {
-                Text("by ")
-                    .font(.subheadline)
-                + Text(post.postAuthor)
-                    .bold()
-                    .font(.subheadline)
-
-                Spacer().frame(height: 6)
-                HStack {
-                    HStack(spacing: 3) {
-                        Image(systemName: "arrow.up")
-                        Text(String(describing: post.postScore))
-                    }
-                    HStack(spacing: 3) {
-                        Image(systemName: "message")
-                        Text(String(describing: post.postCommentCount))
-                    }
-                    HStack(spacing: 3) {
-                        Image(systemName: "clock")
-                        Text(post.postCreatedAt.friendlyAgo)
-                    }
+        .task {
+            if linkData == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
+                self.metadata = try? await linkManager.metadata(for: url)
+                if self.metadata == nil {
+                    self.metadataFailed = true
                 }
-                .font(.footnote)
-            }
-            
-            Spacer()
-            
-            Button(action: {}) {
-                Image(systemName: "ellipsis")
-            }
-            Button(action: {}) {
-                Image(systemName: "arrow.up")
-            }
-            Button(action: {}) {
-                Image(systemName: "arrow.down")
             }
         }
-        .frame(maxWidth: .infinity)
-        .foregroundStyle(theme.labelColor.secondary)
     }
 }
 
@@ -117,7 +121,7 @@ public struct ListPostView: View {
     let post = Post(postId: "1", cursorId: "1", postAuthor: "SomeRedditUser", postAuthorFlair: nil, postSubreddit: "UKPolitics", postTitle: "Wow! TIL You could make a Reddit app smelly smelly smelly smelly...", postScore: 100, postScorePercentage: 100, postCommentCount: 100, postCreatedAt: Date(), postEditedAt: nil, subredditIcon: nil, postFlagDetails: .init(isNSFW: false, isSaved: false, isLocked: false, isStickied: false, isArchived: false, isSpoiler: false), postContent: .init(textContent: "Some content...", contentType: .textOnly, media: []), postVoteStatus: .noVote, postFlair: "Some flair", postRecommendedSort: .best)
     
     let theme: any Theme = colorScheme == .dark ? EchoDarkTheme() : EchoLightTheme()
-
+    
     ZStack {
         List {
             ListPostView(with: post)
@@ -130,4 +134,13 @@ public struct ListPostView: View {
     }
     .environment(\.theme, theme)
 }
-    
+
+
+struct OpenGraphData {
+    var title: String?
+    var link: URL?
+    var type: String?
+    var siteName: String?
+    var description: String?
+    var imageURL: URL?
+}

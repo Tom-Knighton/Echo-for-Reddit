@@ -16,6 +16,7 @@ public struct SubredditPage: View {
     
     @Environment(\.theme) private var theme
     let store = StoreOf<SubredditFeature>(initialState: SubredditFeature.State()) { SubredditFeature() }
+
     private let subredditName: String
     
     public init(subredditName: String) {
@@ -47,7 +48,7 @@ public struct SubredditPage: View {
     
     @ViewBuilder
     private func subredditView(for subreddit: Subreddit) -> some View {
-        List {
+        List {  
             Color.clear
                 .frame(height: 3)
                 .listRowInsets(.init())
