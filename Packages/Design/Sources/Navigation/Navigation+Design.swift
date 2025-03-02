@@ -127,6 +127,10 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
                         }
                     }
                 }
+            } else {
+                coloredNavAppearance.configureWithTransparentBackground()
+                coloredNavAppearance.backgroundImage = nil
+                navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
             }
             
             if let subtitle {
