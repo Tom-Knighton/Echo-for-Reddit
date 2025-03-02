@@ -2,4 +2,5 @@ fragment SubscribedSubredditFragment on SubredditDto {
     subredditId
     subredditTitle
     subredditIconUrl
+    subredditName
 }

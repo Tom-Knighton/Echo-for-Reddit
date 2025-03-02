@@ -8,11 +8,12 @@
 import ComposableArchitecture
 import SwiftUI
 import API
+import Env
 
 public struct SubredditListPage: View {
     
     @Environment(\.theme) private var theme
-    let store = StoreOf<SubredditListFeature>(initialState: SubredditListFeature.State()) { SubredditListFeature() }
+    @State var store = StoreOf<SubredditListFeature>(initialState: SubredditListFeature.State()) { SubredditListFeature() }
 
     public init() {}
     
@@ -26,12 +27,11 @@ public struct SubredditListPage: View {
             
             List {
                 Section("Reddit:") {
-                    redditRow(subredditName: "All", desc: "Posts from all subreddits", imageName: "signpost.right.and.left.fill")
-                    redditRow(subredditName: "Popular", desc: "Curated popular posts from across Reddit", imageName: "chart.line.uptrend.xyaxis")
-                    redditRow(subredditName: "Home", desc: "Posts from your subscribed subreddits", imageName: "house.fill")
+                    redditRow(subredditTitle: "All", desc: "Posts from all subreddits", imageName: "signpost.right.and.left.fill", subredditName: "all")
+                    redditRow(subredditTitle: "Popular", desc: "Curated popular posts from across Reddit", imageName: "chart.line.uptrend.xyaxis", subredditName: "popular")
+                    redditRow(subredditTitle: "Home", desc: "Posts from your subscribed subreddits", imageName: "house.fill", subredditName: "home")
                 }
                 .multilineTextAlignment(.leading)
-                
                 
                 ForEach(store.subscribed.keys.sorted(), id: \.self) { key in
                     Section(key) {
@@ -44,7 +44,9 @@ public struct SubredditListPage: View {
             .scrollContentBackground(.hidden)
         }
         .task {
-            store.send(.fetchSubscribed)
+            if store.subscribed.isEmpty {
+                store.send(.fetchSubscribed)
+            }
         }
         .navigationTitle("Subreddits")
         .customNavigation()
@@ -52,43 +54,47 @@ public struct SubredditListPage: View {
     
     @ViewBuilder
     private func listRow(for subreddit: EchoAPI.SubscribedSubredditFragment) -> some View {
-        HStack {
-            if let avatarURL = URL(string: subreddit.subredditIconUrl ?? "") {
-                AsyncImage(url: avatarURL) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .frame(width: 25, height: 25)
-                            .scaledToFit()
-                            .clipShape(Circle())
-                            .shadow(radius: 3)
-                    default:
-                        Circle()
-                            .fill(Color.gray)
-                            .frame(width: 25, height: 25)
+        NavigationLink(value: RouterDestination.subreddit(subredditName: subreddit.subredditName)) {
+            HStack {
+                if let avatarURL = URL(string: subreddit.subredditIconUrl ?? "") {
+                    AsyncImage(url: avatarURL) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .frame(width: 25, height: 25)
+                                .scaledToFit()
+                                .clipShape(Circle())
+                                .shadow(radius: 3)
+                        default:
+                            Circle()
+                                .fill(Color.gray)
+                                .frame(width: 25, height: 25)
+                        }
                     }
+                } else {
+                    Circle()
+                        .fill(Color.gray)
+                        .frame(width: 25, height: 25)
                 }
-            } else {
-                Circle()
-                    .fill(Color.gray)
-                    .frame(width: 25, height: 25)
+                
+                Text(subreddit.subredditTitle)
             }
-            
-            Text(subreddit.subredditTitle)
         }
     }
     
     @ViewBuilder
-    private func redditRow(subredditName: String, desc: String, imageName: String) -> some View {
-        HStack {
-            Image(systemName: imageName)
-            VStack {
-                Text(subredditName)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text(desc)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.caption)
+    private func redditRow(subredditTitle: String, desc: String, imageName: String, subredditName: String) -> some View {
+        NavigationLink(value: RouterDestination.subreddit(subredditName: subredditName)) {
+            HStack {
+                Image(systemName: imageName)
+                VStack {
+                    Text(subredditName)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(desc)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.caption)
+                }
             }
         }
     }

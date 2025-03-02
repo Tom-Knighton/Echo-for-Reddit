@@ -56,6 +56,7 @@ public extension EchoAPI {
           public var subredditId: String { __data["subredditId"] }
           public var subredditTitle: String { __data["subredditTitle"] }
           public var subredditIconUrl: String? { __data["subredditIconUrl"] }
+          public var subredditName: String { __data["subredditName"] }
 
           public struct Fragments: FragmentContainer {
             public let __data: DataDict

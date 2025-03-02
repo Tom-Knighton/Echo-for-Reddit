@@ -6,10 +6,12 @@
 //
 
 import API
+import Env
 import Foundation
 import ComposableArchitecture
 import Models
 import Combine
+import Design
 
 @Reducer
 struct SubredditFeature {
@@ -18,6 +20,7 @@ struct SubredditFeature {
     struct State : Sendable {
         var subredditData: Subreddit? = nil
         var posts: [Post] = []
+        var openGraphData: [String: OpenGraphData?] = [:]
         var isLoading: Bool = false
         var error: String? = nil
     }
@@ -52,6 +55,7 @@ struct SubredditFeature {
                 }
                 
                 let sort: RedditSortOption = .hot //TODO: Read default from subreddit data
+                
                 return .run { send in
                     do {
                         let response = try await GQLClient().query(EchoAPI.GetSubredditPostsQuery(after: .init(stringLiteral: ""), subredditName: subreddit.subredditName, sort: .init(sort.toGQL())))
@@ -65,7 +69,7 @@ struct SubredditFeature {
                 state.error = nil
                 return .none
                 
-            // Responses
+                // Responses
             case .initialDataLoaded(.success(let data)):
                 state.subredditData = Subreddit(from: data)
                 state.isLoading = false
@@ -82,7 +86,17 @@ struct SubredditFeature {
                 let postsToAppend = newPosts.filter { !existingIDs.contains($0.postId) }
                 state.posts.append(contentsOf: postsToAppend)
                 
-                return .none
+                return .run { send in
+                    await withTaskGroup(of: OpenGraphData?.self) { group in
+                        for post in postsToAppend.filter({ $0.postContent.contentType == .linkOnly }) {
+                            if let url = URL(string: post.postContent.media.first?.url ?? "") {
+                                group.addTask {
+                                    return try? await LPMetadataManager.shared.metadata(for: url)
+                                }
+                            }
+                        }
+                    }
+                }
             case .postsFetched(.failure(let error)):
                 state.error = error.localizedDescription
                 return .none

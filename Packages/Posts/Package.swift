@@ -17,6 +17,7 @@ let package = Package(
             url: "https://github.com/pointfreeco/swift-composable-architecture",
             from: "1.0.0"
         ),
+        .package(url: "https://github.com/pzmudzinski/OpenGraphReader.git", .upToNextMajor(from: "1.0.0")),
         .package(path: "API"),
         .package(path: "Env"),
         .package(path: "Design"),
@@ -32,6 +33,7 @@ let package = Package(
                     name: "ComposableArchitecture",
                     package: "swift-composable-architecture"
                 ),
+                .product(name: "OpenGraphReader", package: "OpenGraphReader"),
                 "API",
                 "Env",
                 "Design",

@@ -6,7 +6,7 @@
 public extension EchoAPI {
   struct SubscribedSubredditFragment: EchoAPI.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      #"fragment SubscribedSubredditFragment on SubredditDto { __typename subredditId subredditTitle subredditIconUrl }"#
+      #"fragment SubscribedSubredditFragment on SubredditDto { __typename subredditId subredditTitle subredditIconUrl subredditName }"#
     }
 
     public let __data: DataDict
@@ -18,11 +18,13 @@ public extension EchoAPI {
       .field("subredditId", String.self),
       .field("subredditTitle", String.self),
       .field("subredditIconUrl", String?.self),
+      .field("subredditName", String.self),
     ] }
 
     public var subredditId: String { __data["subredditId"] }
     public var subredditTitle: String { __data["subredditTitle"] }
     public var subredditIconUrl: String? { __data["subredditIconUrl"] }
+    public var subredditName: String { __data["subredditName"] }
   }
 
 }

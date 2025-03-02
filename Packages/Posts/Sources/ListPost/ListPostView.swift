@@ -10,7 +10,6 @@ import SwiftUI
 import ComposableArchitecture
 import Models
 import Env
-@preconcurrency import OpenGraph
 @preconcurrency import LinkPresentation
 
 public struct ListPostView: View {
@@ -19,9 +18,7 @@ public struct ListPostView: View {
     @Environment(\.linkManager) private var linkManager
     @Environment(\.openURL) private var openURL
     let store: StoreOf<PostListFeature>
-    @State private var linkData: OpenGraphData? = nil
     @State private var metadata: LPLinkMetadata? = nil
-    @State private var metadataFailed: Bool = false
     
     public init() {
         store = StoreOf<PostListFeature>(initialState: PostListFeature.State()) { PostListFeature() }
@@ -62,9 +59,9 @@ public struct ListPostView: View {
             }
             
             if post.postContent.contentType == .linkOnly {
-                if let metadata {
-                    LinkView(metadata: metadata)
-                } else if metadataFailed {
+                if let linkData = store.data {
+                    OGLinkView(data: linkData)
+                } else if store.dataFailed {
                     HStack {
                         Image(systemName: "network")
                         Divider()
@@ -78,7 +75,7 @@ public struct ListPostView: View {
                     .clipShape(.rect(cornerRadius: 10))
                     .shadow(radius: 3)
                     .onTapGesture {
-                        if linkData == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
+                        if store.data == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
                             self.openURL(url)
                         }
                     }
@@ -89,30 +86,20 @@ public struct ListPostView: View {
                         .clipShape(.rect(cornerRadius: 10))
                         .redacted(reason: .placeholder)
                         .onTapGesture {
-                            if linkData == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
+                            if store.data == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
                                 self.openURL(url)
                             }
                         }
                 }
             }
+           
             
             PostDetailsView(post: post)
-                .onAppear {
-                    print("SDDD \(post.postId)")
-                }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 12)
         .multilineTextAlignment(.leading)
-        .task {
-            if linkData == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
-                self.metadata = try? await linkManager.metadata(for: url)
-                if self.metadata == nil {
-                    self.metadataFailed = true
-                }
-            }
-        }
     }
 }
 
@@ -133,14 +120,4 @@ public struct ListPostView: View {
         .scrollContentBackground(.hidden)
     }
     .environment(\.theme, theme)
-}
-
-
-struct OpenGraphData {
-    var title: String?
-    var link: URL?
-    var type: String?
-    var siteName: String?
-    var description: String?
-    var imageURL: URL?
 }
