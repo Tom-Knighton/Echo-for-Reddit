@@ -40,6 +40,9 @@ public struct OGLinkView: View {
     @State private var data = OpenGraphData()
     @State private var uiImage: UIImage? = nil
     
+    private let socialMedia = ["twitter.com", "x.com", "bsky.app"]
+
+    
     public struct ImageData {
         let imageUrl: String
         let imageHeight: Double
@@ -59,10 +62,24 @@ public struct OGLinkView: View {
         self.url = data.link?.absoluteString ?? ""
     }
     
+    private func backgroundColor() -> Color {
+        let url = self.data.link?.absoluteString ?? ""
+        
+        if url.contains("x.com") || url.contains("twitter.com") {
+            return Color.blue.opacity(colorScheme == .dark ? 0.3 : 0.7)
+        }
+        
+        if url.contains("bsky.app") {
+            return Color(0x0a78ff)
+        }
+        
+        return Color.gray.opacity(colorScheme == .dark ? 0.3 : 0.7)
+    }
+    
     public var body: some View {
         VStack {
             Group {
-                if data.link?.absoluteString.contains("x.com") == true {
+                if socialMedia.contains(where: { self.data.link?.absoluteString.contains($0) == true }) {
                     twitterView(for: data)
                 } else {
                     VStack(spacing: 0) {
@@ -72,6 +89,7 @@ public struct OGLinkView: View {
                                 .aspectRatio(contentMode: .fill)
                         } else {
                             Rectangle()
+                                .fill(Color.secondary)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 200)
                         }
@@ -120,7 +138,7 @@ public struct OGLinkView: View {
         if let uiImage {
             Color(uiColor: uiImage.prominentColor ?? .red)
         } else {
-            Color.blue
+            Color.secondary
         }
     }
     
@@ -138,11 +156,17 @@ public struct OGLinkView: View {
                         img
                             .resizable()
                             .aspectRatio(contentMode: .fill)
+                            .frame(maxHeight: 250)
                             .clipShape(.rect(cornerRadius: 12))
                     } placeholder: {
                         Rectangle()
                     }
                 }
+                
+                Text(data.link?.host() ?? "")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             .multilineTextAlignment(.leading)
         }
@@ -151,7 +175,7 @@ public struct OGLinkView: View {
         .frame(maxWidth: .infinity)
         .background(
             Rectangle()
-                .foregroundStyle(Color.blue.opacity(colorScheme == .dark ? 0.3 : 0.7))
+                .foregroundStyle(backgroundColor())
                 .background(.ultraThinMaterial)
         )
     }
@@ -163,7 +187,7 @@ public struct OGLinkView: View {
         
         return true
     }
-    
+        
     private func fetchData() async {
         guard let url = URL(string: self.url) else { return }
         
@@ -176,6 +200,7 @@ public struct OGLinkView: View {
         if let openGraphResponse {
             
             var useImageUrl = true
+            
             if openGraphResponse.url?.absoluteString.contains("x.com") == true {
                 if openGraphResponse.imageURL?.absoluteString.contains("profile_images") == true {
                     useImageUrl = false
