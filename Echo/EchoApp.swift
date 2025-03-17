@@ -10,6 +10,8 @@ import Env
 import API
 import Onboarding
 import Combine
+import Subreddits
+import Design
 
 @main
 struct EchoApp: App {

@@ -14,10 +14,10 @@ import Combine
 import Design
 
 @Reducer
-struct SubredditFeature {
+public struct SubredditFeature {
     
     @ObservableState
-    struct State : Sendable {
+    public struct State : Sendable {
         var subredditData: Subreddit? = nil
         var posts: [Post] = []
         var openGraphData: [String: OpenGraphData?] = [:]
@@ -25,7 +25,7 @@ struct SubredditFeature {
         var error: String? = nil
     }
     
-    enum Action {
+    public enum Action {
         case fetchInitialData(subredditName: String)
         case fetchNextPosts
         case initialDataLoaded(Result<EchoAPI.GetSubredditQuery.Data.Reddit.Subreddit, Error>)
@@ -33,9 +33,9 @@ struct SubredditFeature {
         case postsFetched(Result<[EchoAPI.GetSubredditPostsQuery.Data.Reddit.Subreddit.Posts.Edge.Node], Error>)
     }
     
-    struct DataSourceLoadMoreID: Hashable {}
+    public struct DataSourceLoadMoreID: Hashable {}
     
-    var body: some Reducer<State, Action> {
+    public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .fetchInitialData(let subredditName):

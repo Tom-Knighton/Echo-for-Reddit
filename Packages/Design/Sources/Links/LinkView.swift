@@ -39,6 +39,8 @@ public struct OGLinkView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var data = OpenGraphData()
     @State private var uiImage: UIImage? = nil
+    @State private var textColour: Color = Color.primary
+    @State private var imageColour: Color = Color.secondary
     
     private let socialMedia = ["twitter.com", "x.com", "bsky.app"]
 
@@ -83,16 +85,7 @@ public struct OGLinkView: View {
                     twitterView(for: data)
                 } else {
                     VStack(spacing: 0) {
-                        if let uiImage {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } else {
-                            Rectangle()
-                                .fill(Color.secondary)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 200)
-                        }
+                        image()
                         
                         VStack {
                             if let title = data.title {
@@ -100,25 +93,25 @@ public struct OGLinkView: View {
                                     .bold()
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .multilineTextAlignment(.leading)
-                                    .foregroundStyle(Color(uiColor: uiImage?.bestTextColor ?? .label))
+                                    .font(.headline)
+                                    .foregroundStyle(self.textColour)
                             }
                             if let url = data.link {
                                 Text(url.host() ?? url.absoluteString)
                                     .lineLimit(1)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .font(.subheadline)
-                                    .foregroundStyle(Color(uiColor: uiImage?.bestTextColor ?? .label).tertiary)
+                                    .foregroundStyle(self.textColour)
                             }
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(infoBackground())
+                        .background(self.imageColour)
                     }
                 }
             }
             .clipShape(.rect(cornerRadius: 10))
             .cornerRadius(15)
-            .transition(.scale(scale: 0.0, anchor: .top).combined(with: .opacity))
         }
         .frame(maxWidth: .infinity, alignment: .center)
         .task {
@@ -128,17 +121,39 @@ public struct OGLinkView: View {
         }
         .task(id: data.link) {
             if uiImage == nil, let imageUrl = data.imageURL {
-                uiImage = try? await ImageLoader.shared.loadImage(from: imageUrl)
+                async let imageData = try? await ImageLoader.shared.loadImage(from: imageUrl)
+                uiImage = await imageData
+                self.textColour = Color(uiImage?.bestTextColor ?? .label)
+                self.imageColour = Color(uiImage?.prominentColor ?? .secondarySystemBackground)
             }
         }
     }
     
     @ViewBuilder
-    private func infoBackground() -> some View {
-        if let uiImage {
-            Color(uiColor: uiImage.prominentColor ?? .red)
-        } else {
-            Color.secondary
+    private func image() -> some View {
+        Group {
+            ZStack {
+                Rectangle()
+                    .fill(Color.secondary)
+                    .frame(height: 200)
+                    .opacity(uiImage == nil ? 1 : 1)
+                if let uiImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxHeight: 200, alignment: .bottom)
+                        .transition(.identity)
+                        .animation(nil, value: uiImage)
+                        .transaction { transaction in
+                            transaction.animation = nil
+                        }
+                }
+            }
+        }
+        .id("image")
+        .transaction { transaction in
+            transaction.animation = nil
+            transaction.disablesAnimations = true
         }
     }
     
@@ -152,14 +167,17 @@ public struct OGLinkView: View {
                 Text((data.description ?? "").truncate(length: 250))
                 
                 if useImageUrl(for: data), let image = data.imageURL {
-                    AsyncImage(url: image) { img in
-                        img
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(maxHeight: 250)
-                            .clipShape(.rect(cornerRadius: 12))
-                    } placeholder: {
-                        Rectangle()
+                    AsyncImage(url: image, transaction: .init(animation: nil)) { phase in
+                        switch phase {
+                        case .success(let img):
+                            img
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(maxHeight: 250)
+                                .clipShape(.rect(cornerRadius: 12))
+                        default:
+                            Rectangle()
+                        }
                     }
                 }
                 
@@ -222,9 +240,10 @@ public struct OGLinkView: View {
             self.data = data
         }
         
-        if uiImage == nil, let imageUrl = data.imageURL {
-            uiImage = try? await ImageLoader.shared.loadImage(from: imageUrl)
-        }
+//        if uiImage == nil, let imageUrl = data.imageURL {
+//            let data = try? await ImageLoader.shared.loadImage(from: imageUrl)
+//            uiImage = data
+//        }
     }
 }
 

@@ -16,7 +16,7 @@ public struct SubredditPage: View {
     
     @Environment(\.theme) private var theme
     let store = StoreOf<SubredditFeature>(initialState: SubredditFeature.State()) { SubredditFeature() }
-
+    
     private let subredditName: String
     
     public init(subredditName: String) {
@@ -25,13 +25,13 @@ public struct SubredditPage: View {
     
     public var body: some View {
         ZStack {
-            theme.primaryBackground.ignoresSafeArea()
-            
             if store.isLoading {
+                theme.primaryBackground.ignoresSafeArea()
                 ProgressView()
             }
             
             if let error = store.error {
+                theme.primaryBackground.ignoresSafeArea()
                 Text(error)
             }
             
@@ -39,6 +39,8 @@ public struct SubredditPage: View {
                 subredditView(for: subreddit)
             }
         }
+        .navigationTitle(store.state.subredditData?.subredditTitle ?? "")
+        .navigationBarTitleDisplayMode(.large)
         .task {
             store.send(.fetchInitialData(subredditName: subredditName))
         }
@@ -48,39 +50,26 @@ public struct SubredditPage: View {
     
     @ViewBuilder
     private func subredditView(for subreddit: Subreddit) -> some View {
-        List {  
-            Color.clear
-                .frame(height: 3)
-                .listRowInsets(.init())
-                .listRowBackground(theme.primaryBackground)
-                .listRowSeparator(.hidden)
-            ForEach(store.posts) { post in
-                ListPostView(with: post)
-            }
-        }
-        .searchable(text: $search)
-        .environment(\.defaultMinListRowHeight, 3)
-        .listStyle(.plain)
-        .listRowSpacing(12)
-        .scrollContentBackground(.hidden)
-        .navigationTitle(subreddit.subredditTitle)
-        .customNavigation(with: {
-            if let avatarURL = URL(string: subreddit.subredditIconUrl ?? "") {
-                AsyncImage(url: avatarURL) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .frame(width: 44, height: 44)
-                            .scaledToFit()
-                            .clipShape(Circle())
-                            .shadow(radius: 3)
-                    default:
-                        Circle()
-                            .fill(Color.gray)
+        SubredditCollectionView(with: store)
+            .ignoresSafeArea()
+            .searchable(text: $search)
+            .customNavigation(with: {
+                if let avatarURL = URL(string: subreddit.subredditIconUrl ?? "") {
+                    AsyncImage(url: avatarURL) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .frame(width: 44, height: 44)
+                                .scaledToFit()
+                                .clipShape(Circle())
+                                .shadow(radius: 3)
+                        default:
+                            Circle()
+                                .fill(Color.gray)
+                        }
                     }
                 }
-            }
-        }, backgroundUrl: subreddit.bannerImageUrl)
+            }, backgroundUrl: subreddit.bannerImageUrl)        
     }
 }

@@ -30,20 +30,24 @@ public struct ListPostView: View {
     }
     
     public var body: some View {
-        ZStack {
-            if store.isLoading {
-                ProgressView()
+        VStack(spacing: 0) {
+            ZStack {
+                if store.isLoading {
+                    ProgressView()
+                }
+                
+                if let post = store.post {
+                    postView(for: post)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(theme.primaryBackground)
+            .fontDesign(.rounded)
             
-            if let post = store.post {
-                postView(for: post)
-            }
+            Rectangle()
+                .fill(theme.layer2)
+                .frame(height: 12)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .listRowInsets(.init())
-        .listRowBackground(theme.layer2)
-        .listRowSeparator(.hidden)
-        .fontDesign(.rounded)
     }
     
     @ViewBuilder

@@ -4,71 +4,55 @@
 //
 //  Created by Tom Knighton on 04/02/2025.
 //
-import UIKit
+@preconcurrency import UIKit
 
 extension UIImage {
     
-    var averageBrightness: CGFloat? {
-        guard let inputImage = CIImage(image: self) else { return nil }
+    private static let sharedCgContext = CGContext(data: nil,
+                                                   width: 1,
+                                                   height: 1,
+                                                   bitsPerComponent: 8,
+                                                   bytesPerRow: 4,
+                                                   space: CGColorSpaceCreateDeviceRGB(),
+                                                   bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
+    
+    
+    private var averageBrightness: CGFloat? {
+        guard let cgImage = self.cgImage else { return nil }
         
-        let extentVector = CIVector(x: inputImage.extent.origin.x,
-                                    y: inputImage.extent.origin.y,
-                                    z: inputImage.extent.size.width,
-                                    w: inputImage.extent.size.height)
+        guard let ctx = UIImage.sharedCgContext else { return nil }
         
-        guard let filter = CIFilter(name: "CIAreaAverage",
-                                    parameters: [kCIInputImageKey: inputImage,
-                                                kCIInputExtentKey: extentVector]),
-              let outputImage = filter.outputImage else { return nil }
+        ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+        guard let pixelData = ctx.data else { return nil }
         
-        var bitmap = [UInt8](repeating: 0, count: 4)
-        let context = CIContext(options: [.workingColorSpace: kCFNull!])
-        context.render(outputImage,
-                       toBitmap: &bitmap,
-                       rowBytes: 4,
-                       bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-                       format: .RGBA8,
-                       colorSpace: nil)
+        let data = pixelData.bindMemory(to: UInt8.self, capacity: 4)
+        let red   = CGFloat(data[0]) / 255.0
+        let green = CGFloat(data[1]) / 255.0
+        let blue  = CGFloat(data[2]) / 255.0
         
-        let red   = CGFloat(bitmap[0]) / 255.0
-        let green = CGFloat(bitmap[1]) / 255.0
-        let blue  = CGFloat(bitmap[2]) / 255.0
-        
-        let brightness = (red * 0.299) + (green * 0.587) + (blue * 0.114)
-        return brightness
+        return (red * 0.299) + (green * 0.587) + (blue * 0.114)
     }
     
-    public var bestTextColor: UIColor? {
-        let threshold: CGFloat = 0.5
-        
+    public var bestTextColor: UIColor {
+        let threshold: CGFloat = 0.7
         if let brightness = averageBrightness {
             return brightness > threshold ? .black : .white
-        } else {
-            return nil
         }
+        return .label
     }
     
     public var prominentColor: UIColor? {
-        guard let inputImage = CIImage(image: self) else { return nil }
-        let extent = inputImage.extent
-        let context = CIContext(options: nil)
-        guard let filter = CIFilter(name: "CIAreaAverage", parameters: [
-            kCIInputImageKey: inputImage,
-            kCIInputExtentKey: CIVector(cgRect: extent)
-        ]),
-              let outputImage = filter.outputImage else { return nil }
+        guard let cgImage = self.cgImage else { return nil }
         
-        var bitmap = [UInt8](repeating: 0, count: 4)
-        context.render(outputImage,
-                       toBitmap: &bitmap,
-                       rowBytes: 4,
-                       bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
-                       format: .RGBA8,
-                       colorSpace: nil)
+        guard let context = UIImage.sharedCgContext else { return nil }
         
-        return UIColor(red: CGFloat(bitmap[0]) / 255,
-                       green: CGFloat(bitmap[1]) / 255,
-                       blue: CGFloat(bitmap[2]) / 255,
-                       alpha: CGFloat(bitmap[3]) / 255)
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+        guard let pixelData = context.data else { return nil }
+        
+        let data = pixelData.bindMemory(to: UInt8.self, capacity: 4)
+        return UIColor(red: CGFloat(data[0]) / 255.0,
+                       green: CGFloat(data[1]) / 255.0,
+                       blue: CGFloat(data[2]) / 255.0,
+                       alpha: CGFloat(data[3]) / 255.0)
     }
 }

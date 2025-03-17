@@ -107,7 +107,8 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
             navigationController.navigationBar.standardAppearance.largeTitleTextAttributes = [.font: titleFont]
             navigationController.navigationBar.standardAppearance.titleTextAttributes = [.font: smallTitleFont]
             let coloredNavAppearance = UINavigationBarAppearance()
-            
+            coloredNavAppearance.largeTitleTextAttributes = [.font: titleFont]
+            coloredNavAppearance.titleTextAttributes = [.font: smallTitleFont]
             
             if let backgroundUrl, let url = URL(string: backgroundUrl) {
                 Task {
@@ -204,7 +205,7 @@ actor ImageLoader {
         }
         
         cache.setObject(image, forKey: url as NSURL)
-        return image
+        return await image.byPreparingForDisplay() ?? image
         
     }
 }
