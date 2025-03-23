@@ -43,7 +43,7 @@ struct SubredditListFeature {
                 // Responses
             case .subscribedLoaded(.success(let subreddits)):
                 let groupedDictionary = Dictionary(grouping: subreddits) { obj in
-                    String(obj.subredditTitle.prefix(1)).uppercased()
+                    String(obj.subredditName.prefix(1)).uppercased()
                 }
                 state.subscribed = groupedDictionary.mapValues { group in
                     group.sorted(by: { $0.subredditTitle < $1.subredditTitle })

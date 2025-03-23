@@ -78,7 +78,7 @@ public struct SubredditListPage: View {
                         .frame(width: 25, height: 25)
                 }
                 
-                Text(subreddit.subredditTitle)
+                Text(subreddit.subredditName)
             }
         }
     }

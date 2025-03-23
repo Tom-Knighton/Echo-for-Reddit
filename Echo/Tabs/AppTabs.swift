@@ -34,7 +34,7 @@ extension AppTab {
     fileprivate var rootView: some View {
         switch self {
         case .posts:
-            SubredditPage(subredditName: "UKPolitics")
+            SubredditListPage()
         case .search:
             Text("TODO")
         case .profile:
