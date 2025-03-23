@@ -147,7 +147,7 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-    
+        
     }
     
     
@@ -200,13 +200,42 @@ actor ImageLoader {
             throw URLError(.badServerResponse)
         }
         
-        guard let image = UIImage(data: data) else {
+        guard var image = UIImage(data: data) else {
             throw URLError(.cannotDecodeContentData)
+        }
+        
+        if let downsampled = resizedImageWith(image: image, targetSize: .init(width: 100, height: 150)) {
+            image = downsampled
         }
         
         cache.setObject(image, forKey: url as NSURL)
         return await image.byPreparingForDisplay() ?? image
         
+    }
+    
+    private func resizedImageWith(image: UIImage, targetSize: CGSize) -> UIImage? {
+        
+        let imageSize = image.size
+        let newWidth  = targetSize.width  / image.size.width
+        let newHeight = targetSize.height / image.size.height
+        var newSize: CGSize
+
+        if(newWidth > newHeight) {
+            newSize = CGSizeMake(imageSize.width * newHeight, imageSize.height * newHeight)
+        } else {
+            newSize = CGSizeMake(imageSize.width * newWidth,  imageSize.height * newWidth)
+        }
+
+        let rect = CGRectMake(0, 0, newSize.width, newSize.height)
+
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+
+        image.draw(in: rect)
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
     }
 }
 
