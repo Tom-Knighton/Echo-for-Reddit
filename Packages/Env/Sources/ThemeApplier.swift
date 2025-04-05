@@ -5,7 +5,6 @@
 //  Created by Tom Knighton on 27/01/2025.
 //
 import SwiftUI
-import Design
 
 extension View {
     public func applyTheme() -> some View {

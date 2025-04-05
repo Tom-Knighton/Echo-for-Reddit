@@ -5,30 +5,10 @@
 //  Created by Tom Knighton on 08/02/2025.
 //
 
+import Env
 import SwiftUI
-@preconcurrency import OpenGraph
 @preconcurrency import OpenGraphReader
 @preconcurrency import LinkPresentation
-
-public struct OpenGraphData: Sendable {
-    let title: String?
-    let link: URL?
-    let type: String?
-    let siteName: String?
-    let description: String?
-    let imageURL: URL?
-    let siteIconUrl: URL?
-    
-    public init(title: String? = nil, link: URL? = nil, type: String? = nil, siteName: String? = nil, description: String? = nil, imageURL: URL? = nil, siteIconUrl: URL? = nil) {
-        self.title = title
-        self.link = link
-        self.type = type
-        self.siteName = siteName
-        self.description = description
-        self.imageURL = imageURL
-        self.siteIconUrl = siteIconUrl
-    }
-}
 
 public struct OGLinkView: View {
     
@@ -41,9 +21,6 @@ public struct OGLinkView: View {
     @State private var uiImage: UIImage? = nil
     @State private var textColour: Color = Color.primary
     @State private var imageColour: Color = Color.secondary
-    
-    private let socialMedia = ["twitter.com", "x.com", "bsky.app"]
-
     
     public struct ImageData {
         let imageUrl: String
@@ -63,25 +40,13 @@ public struct OGLinkView: View {
         self._data = State(wrappedValue: data)
         self.url = data.link?.absoluteString ?? ""
     }
-    
-    private func backgroundColor() -> Color {
-        let url = self.data.link?.absoluteString ?? ""
-        
-        if url.contains("x.com") || url.contains("twitter.com") {
-            return Color.blue.opacity(colorScheme == .dark ? 0.3 : 0.7)
-        }
-        
-        if url.contains("bsky.app") {
-            return Color(0x0a78ff)
-        }
-        
-        return Color.gray.opacity(colorScheme == .dark ? 0.3 : 0.7)
-    }
-    
+
     public var body: some View {
         VStack {
             Group {
-                if socialMedia.contains(where: { self.data.link?.absoluteString.contains($0) == true }) {
+                if let url = data.link, let subreddit = url.extractSubreddit() {
+                    SubredditLink(subredditName: subreddit)
+                } else if let url = data.link, isSocialLink(url) {
                     twitterView(for: data)
                 } else {
                     VStack(spacing: 0) {
@@ -239,11 +204,26 @@ public struct OGLinkView: View {
             
             self.data = data
         }
+    }
+    
+    private func backgroundColor() -> Color {
+        let url = self.data.link?.absoluteString ?? ""
         
-//        if uiImage == nil, let imageUrl = data.imageURL {
-//            let data = try? await ImageLoader.shared.loadImage(from: imageUrl)
-//            uiImage = data
-//        }
+        if url.contains("x.com") || url.contains("twitter.com") {
+            return Color.blue.opacity(colorScheme == .dark ? 0.3 : 0.7)
+        }
+        
+        if url.contains("bsky.app") {
+            return Color(0x0a78ff)
+        }
+        
+        return Color.gray.opacity(colorScheme == .dark ? 0.3 : 0.7)
+    }
+    
+    func isSocialLink(_ url: URL) -> Bool {
+        guard let host = url.host else { return false }
+        let socialDomains = ["twitter.com", "x.com", "bsky.app"]
+        return socialDomains.contains { host.contains($0) }
     }
 }
 

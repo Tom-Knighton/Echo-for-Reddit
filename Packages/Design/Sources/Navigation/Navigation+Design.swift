@@ -117,7 +117,7 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
                         coloredNavAppearance.configureWithOpaqueBackground()
                         coloredNavAppearance.backgroundImage = image
                         coloredNavAppearance.backgroundImageContentMode = .scaleAspectFill
-                        let color = image.bestTextColor ?? UIColor.label
+                        let color = image.bestTextColor
                         coloredNavAppearance.largeTitleTextAttributes = [.foregroundColor: color, .font: titleFont]
                         navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
                         

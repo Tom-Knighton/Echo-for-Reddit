@@ -63,26 +63,12 @@ public struct ListPostView: View {
             }
             
             if post.postContent.contentType == .linkOnly {
-                if let linkData = store.data {
+                if let subreddit = post.postContent.media.first?.url.extractSubreddit() {
+                    SubredditLink(subredditName: subreddit)
+                } else if let linkData = store.data {
                     OGLinkView(data: linkData)
                 } else if store.dataFailed {
-                    HStack {
-                        Image(systemName: "network")
-                        Divider()
-                        Text(post.postContent.media.first?.url ?? "Visit Link")
-                            .lineLimit(1)
-                        Spacer()
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(theme.layer3)
-                    .clipShape(.rect(cornerRadius: 10))
-                    .shadow(radius: 3)
-                    .onTapGesture {
-                        if store.data == nil, post.postContent.contentType == .linkOnly, let url = URL(string: post.postContent.media.first?.url ?? "") {
-                            self.openURL(url)
-                        }
-                    }
+                    GenericLinkView(post.postContent.media.first?.url ?? "")
                 } else {
                     Rectangle()
                         .fill(theme.layer3)

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Design
 @preconcurrency import LinkPresentation
 @preconcurrency import OpenGraphReader
 
@@ -20,6 +19,17 @@ public final actor LPMetadataManager {
     public func metadata(for url: URL) async throws -> OpenGraphData? {
         if let cached = cache[url] {
             return cached
+        }
+        
+        if let subreddit = url.extractSubreddit() {
+            let data = OpenGraphData(
+                title: subreddit,
+                link: URL(string: "r/\(subreddit)"),
+                type: "subreddit",
+                siteName: subreddit
+            )
+            cache[url] = data
+            return data
         }
         
         var openGraphResponse = await retrieve(url)
