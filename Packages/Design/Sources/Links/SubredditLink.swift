@@ -6,8 +6,11 @@
 //
 
 import SwiftUI
+import Env
 
 public struct SubredditLink: View {
+    
+    @Environment(Router.self) private var router
     
     private let subredditName: String
     
@@ -15,10 +18,9 @@ public struct SubredditLink: View {
         self.subredditName = subredditName
     }
     
-    
     public var body: some View {
         GenericLinkView(subredditName, iconName: "r.circle") {
-            //TODO:
+            router.push(.subreddit(subredditName: subredditName))
         }
     }
 }
