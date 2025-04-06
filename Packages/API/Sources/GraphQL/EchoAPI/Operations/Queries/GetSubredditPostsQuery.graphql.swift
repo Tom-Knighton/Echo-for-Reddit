@@ -8,7 +8,7 @@ public extension EchoAPI {
     public static let operationName: String = "GetSubredditPosts"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query GetSubredditPosts($after: String, $subredditName: String!, $sort: RedditSortOption!) { reddit { __typename subreddit(subredditName: $subredditName) { __typename posts(first: 25, after: $after, sort: $sort) { __typename edges { __typename node { __typename ...SubredditPostFragment } } } } } }"#,
+        #"query GetSubredditPosts($after: String, $subredditName: String!, $sort: RedditSortOption!) { reddit { __typename subreddit(subredditName: $subredditName) { __typename posts(first: 25, after: $after, sort: $sort) { __typename edges { __typename node { __typename ...SubredditPostFragment parentPost { __typename ...SubredditPostFragment } } } } } } }"#,
         fragments: [SubredditPostFragment.self]
       ))
 
@@ -119,9 +119,11 @@ public extension EchoAPI {
                 public static var __parentType: any ApolloAPI.ParentType { EchoAPI.Objects.PostDto }
                 public static var __selections: [ApolloAPI.Selection] { [
                   .field("__typename", String.self),
+                  .field("parentPost", ParentPost?.self),
                   .fragment(SubredditPostFragment.self),
                 ] }
 
+                public var parentPost: ParentPost? { __data["parentPost"] }
                 public var postId: String { __data["postId"] }
                 public var cursorId: String { __data["cursorId"] }
                 public var postAuthor: String { __data["postAuthor"] }
@@ -141,6 +143,45 @@ public extension EchoAPI {
                   public init(_dataDict: DataDict) { __data = _dataDict }
 
                   public var subredditPostFragment: SubredditPostFragment { _toFragment() }
+                }
+
+                /// Reddit.Subreddit.Posts.Edge.Node.ParentPost
+                ///
+                /// Parent Type: `PostDto`
+                public struct ParentPost: EchoAPI.SelectionSet {
+                  public let __data: DataDict
+                  public init(_dataDict: DataDict) { __data = _dataDict }
+
+                  public static var __parentType: any ApolloAPI.ParentType { EchoAPI.Objects.PostDto }
+                  public static var __selections: [ApolloAPI.Selection] { [
+                    .field("__typename", String.self),
+                    .fragment(SubredditPostFragment.self),
+                  ] }
+
+                  public var postId: String { __data["postId"] }
+                  public var cursorId: String { __data["cursorId"] }
+                  public var postAuthor: String { __data["postAuthor"] }
+                  public var postFlair: String? { __data["postFlair"] }
+                  public var postSubreddit: String { __data["postSubreddit"] }
+                  public var postTitle: String { __data["postTitle"] }
+                  public var postScore: Int { __data["postScore"] }
+                  public var postCommentCount: Int { __data["postCommentCount"] }
+                  public var subredditIcon: String? { __data["subredditIcon"] }
+                  public var postCreatedAt: EchoAPI.DateTime { __data["postCreatedAt"] }
+                  public var postVoteStatus: GraphQLEnum<EchoAPI.VoteStatus>? { __data["postVoteStatus"] }
+                  public var postFlagDetails: PostFlagDetails { __data["postFlagDetails"] }
+                  public var postContent: PostContent { __data["postContent"] }
+
+                  public struct Fragments: FragmentContainer {
+                    public let __data: DataDict
+                    public init(_dataDict: DataDict) { __data = _dataDict }
+
+                    public var subredditPostFragment: SubredditPostFragment { _toFragment() }
+                  }
+
+                  public typealias PostFlagDetails = SubredditPostFragment.PostFlagDetails
+
+                  public typealias PostContent = SubredditPostFragment.PostContent
                 }
 
                 public typealias PostFlagDetails = SubredditPostFragment.PostFlagDetails

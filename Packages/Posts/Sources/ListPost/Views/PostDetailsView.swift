@@ -11,48 +11,83 @@ struct PostDetailsView: View {
     
     @Environment(\.theme) private var theme
     let post: Post
+    let isCrossPost: Bool
+    
+    init(_ post: Post, isCrossPost: Bool = false) {
+        self.post = post
+        self.isCrossPost = isCrossPost
+    }
     
     public var body: some View {
         Spacer().frame(height: 6)
         HStack {
-            VStack(alignment: .leading) {
-                Text("by ")
-                    .font(.subheadline)
-                + Text(post.postAuthor)
-                    .bold()
-                    .font(.subheadline)
-
+            layout {
+                inOrByDetails()
                 Spacer().frame(height: 6)
                 HStack {
                     HStack(spacing: 3) {
                         Image(systemName: "arrow.up")
                         Text(String(describing: post.postScore))
+                            .fixedSize()
                     }
                     HStack(spacing: 3) {
                         Image(systemName: "message")
                         Text(String(describing: post.postCommentCount))
+                            .fixedSize()
                     }
                     HStack(spacing: 3) {
                         Image(systemName: "clock")
                         Text(post.postCreatedAt.friendlyAgo)
+                            .fixedSize()
                     }
                 }
                 .font(.footnote)
             }
             
-            Spacer()
-            
-            Button(action: {}) {
-                Image(systemName: "ellipsis")
-            }
-            Button(action: {}) {
-                Image(systemName: "arrow.up")
-            }
-            Button(action: {}) {
-                Image(systemName: "arrow.down")
+            if !isCrossPost {
+                Spacer()
+                
+                Button(action: {}) {
+                    Image(systemName: "ellipsis")
+                }
+                Button(action: {}) {
+                    Image(systemName: "arrow.up")
+                }
+                Button(action: {}) {
+                    Image(systemName: "arrow.down")
+                }
             }
         }
         .frame(maxWidth: .infinity)
         .foregroundStyle(theme.labelColor.secondary)
+    }
+    
+    @ViewBuilder
+    private func inOrByDetails() -> some View {
+        HStack {
+            if isCrossPost {
+                Image(systemName: "arrow.trianglehead.branch")
+                    .rotationEffect(.degrees(90))
+                Text(post.postSubreddit)
+                    .bold()
+                    .fixedSize()
+            } else {
+                Text("by ")
+                + Text(post.postAuthor)
+                    .bold()
+            }
+        }
+        .fixedSize()
+        .font(.subheadline)
+    }
+    
+    @ViewBuilder private func layout<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        Group {
+            if isCrossPost{
+                HStack(content: content)
+            } else {
+                VStack(alignment: .leading, content: content)
+            }
+        }
     }
 }

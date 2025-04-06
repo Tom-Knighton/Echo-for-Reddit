@@ -81,7 +81,7 @@ public struct SubredditFeature {
                 return .none
                 
             case .postsFetched(.success(let postNodes)):
-                let newPosts = postNodes.compactMap { Post(from: $0) }
+                let newPosts = postNodes.compactMap { Post(from: $0.fragments.subredditPostFragment, with: $0.parentPost?.fragments.subredditPostFragment) }
                 let existingIDs = Set(state.posts.map { $0.postId })
                 let postsToAppend = newPosts.filter { !existingIDs.contains($0.postId) }
                 state.posts.append(contentsOf: postsToAppend)

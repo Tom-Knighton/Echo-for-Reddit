@@ -209,6 +209,7 @@ type PostDto {
   postVoteStatus: VoteStatus
   postFlair: String
   postRecommendedSort: RedditSortOption!
+  parentPost: PostDto
   comments(
     """Returns the elements in the list that come after the specified cursor."""
     after: String

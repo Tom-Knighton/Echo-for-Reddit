@@ -19,14 +19,16 @@ public struct ListPostView: View {
     @Environment(\.openURL) private var openURL
     let store: StoreOf<PostListFeature>
     @State private var metadata: LPLinkMetadata? = nil
+    private var isCrossPost: Bool = false
     
     public init() {
         store = StoreOf<PostListFeature>(initialState: PostListFeature.State()) { PostListFeature() }
     }
     
-    public init(with post: Post) {
+    public init(with post: Post, isCrossPost: Bool = false) {
         store = StoreOf<PostListFeature>(initialState: PostListFeature.State(post: post)) { PostListFeature() }
         store.send(.loadPost(post))
+        self.isCrossPost = isCrossPost
     }
     
     public var body: some View {
@@ -41,12 +43,15 @@ public struct ListPostView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(theme.primaryBackground)
+            .background(isCrossPost ? theme.layer2 : theme.primaryBackground)
             .fontDesign(.rounded)
+            .clipShape(.rect(cornerRadius: isCrossPost ? 10 : 0))
             
-            Rectangle()
-                .fill(theme.layer2)
-                .frame(height: 12)
+            if !isCrossPost {
+                Rectangle()
+                    .fill(theme.layer2)
+                    .frame(height: 12)
+            }
         }
     }
     
@@ -60,6 +65,10 @@ public struct ListPostView: View {
             
             if post.postContent.contentType == .textOnly, let textContent = post.postContent.textContent, !textContent.isEmpty {
                 PostTextContent(textContent: textContent)
+            }
+            
+            if let parent = post.parentPost {
+                ListPostView(with: parent, isCrossPost: true)
             }
             
             if post.postContent.contentType == .linkOnly {
@@ -83,8 +92,8 @@ public struct ListPostView: View {
                 }
             }
            
-            
-            PostDetailsView(post: post)
+            PostDetailsView(post, isCrossPost: isCrossPost)
+
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
@@ -95,15 +104,18 @@ public struct ListPostView: View {
 
 #Preview {
     @Previewable @Environment(\.colorScheme) var colorScheme
-    let post = Post(postId: "1", cursorId: "1", postAuthor: "SomeRedditUser", postAuthorFlair: nil, postSubreddit: "UKPolitics", postTitle: "Wow! TIL You could make a Reddit app smelly smelly smelly smelly...", postScore: 100, postScorePercentage: 100, postCommentCount: 100, postCreatedAt: Date(), postEditedAt: nil, subredditIcon: nil, postFlagDetails: .init(isNSFW: false, isSaved: false, isLocked: false, isStickied: false, isArchived: false, isSpoiler: false), postContent: .init(textContent: "Some content...", contentType: .textOnly, media: []), postVoteStatus: .noVote, postFlair: "Some flair", postRecommendedSort: .best)
+    let post = Post(postId: "1", cursorId: "1", postAuthor: "SomeRedditUser", postAuthorFlair: nil, postSubreddit: "UKPolitics", postTitle: "Wow! TIL You could make a Reddit app smelly smelly smelly smelly...", postScore: 100, postScorePercentage: 100, postCommentCount: 100, postCreatedAt: Date(), postEditedAt: nil, subredditIcon: nil, postFlagDetails: .init(isNSFW: false, isSaved: false, isLocked: false, isStickied: false, isArchived: false, isSpoiler: false), postContent: .init(textContent: "Some content...", contentType: .textOnly, media: []), postVoteStatus: .noVote, postFlair: "Some flair", postRecommendedSort: .best, parentPost: Post(postId: "1", cursorId: "1", postAuthor: "SomeRedditUser", postAuthorFlair: nil, postSubreddit: "UKPolitics", postTitle: "Wow! TIL You could make a Reddit app smelly smelly smelly smelly...", postScore: 100, postScorePercentage: 100, postCommentCount: 100, postCreatedAt: Date(), postEditedAt: nil, subredditIcon: nil, postFlagDetails: .init(isNSFW: false, isSaved: false, isLocked: false, isStickied: false, isArchived: false, isSpoiler: false), postContent: .init(textContent: "Some content...", contentType: .textOnly, media: []), postVoteStatus: .noVote, postFlair: "Some flair", postRecommendedSort: .best))
+    
     
     let theme: any Theme = colorScheme == .dark ? EchoDarkTheme() : EchoLightTheme()
     
     ZStack {
-        List {
-            ListPostView(with: post)
-            ListPostView(with: post)
-            ListPostView(with: post)
+        ScrollView {
+            VStack(spacing: 0) {
+                ListPostView(with: post)
+                ListPostView(with: post)
+                ListPostView(with: post)
+            }
         }
         .listStyle(.plain)
         .listRowSpacing(8)

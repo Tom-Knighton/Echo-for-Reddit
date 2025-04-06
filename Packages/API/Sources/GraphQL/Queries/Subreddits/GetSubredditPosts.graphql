@@ -5,6 +5,9 @@ query GetSubredditPosts($after: String, $subredditName: String!, $sort: RedditSo
                 edges {
                     node {
                         ...SubredditPostFragment
+                        parentPost {
+                           ...SubredditPostFragment
+                        }
                     }
                 }
             }

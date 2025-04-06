@@ -61,7 +61,10 @@ public final class Post: RedditThing, @unchecked Sendable {
     /// How the post comments should be sorted by
     public let postRecommendedSort: RedditSortOption?
     
-    public init(postId: String, cursorId: String, postAuthor: String, postAuthorFlair: String?, postSubreddit: String, postTitle: String, postScore: Int, postScorePercentage: Int, postCommentCount: Int, postCreatedAt: Date, postEditedAt: Date?, subredditIcon: String?, postFlagDetails: PostFlagDetails, postContent: PostContent, postVoteStatus: VoteStatus?, postFlair: String?, postRecommendedSort: RedditSortOption) {
+    /// If this post is a cross-post, this is the original or parent post
+    public let parentPost: Post?
+    
+    public init(postId: String, cursorId: String, postAuthor: String, postAuthorFlair: String?, postSubreddit: String, postTitle: String, postScore: Int, postScorePercentage: Int, postCommentCount: Int, postCreatedAt: Date, postEditedAt: Date?, subredditIcon: String?, postFlagDetails: PostFlagDetails, postContent: PostContent, postVoteStatus: VoteStatus?, postFlair: String?, postRecommendedSort: RedditSortOption, parentPost: Post? = nil) {
         self.postId = postId
         self.cursorId = cursorId
         self.postAuthor = postAuthor
@@ -79,9 +82,10 @@ public final class Post: RedditThing, @unchecked Sendable {
         self.postVoteStatus = postVoteStatus
         self.postFlair = postFlair
         self.postRecommendedSort = postRecommendedSort
+        self.parentPost = parentPost
     }
     
-    public init(from post: EchoAPI.GetSubredditPostsQuery.Data.Reddit.Subreddit.Posts.Edge.Node) {
+    public init(from post: EchoAPI.SubredditPostFragment, with parentPost: EchoAPI.SubredditPostFragment? = nil) {
         self.postId = post.postId
         self.cursorId = post.cursorId
         self.postAuthor = post.postAuthor
@@ -104,6 +108,12 @@ public final class Post: RedditThing, @unchecked Sendable {
         }
         self.postContent = .init(textContent: post.postContent.textContent, contentType: contentType ?? .textOnly, media: media)
         self.postVoteStatus = VoteStatus(rawValue: post.postVoteStatus?.rawValue ?? VoteStatus.noVote.rawValue)
+        
+        if let parentPost {
+            self.parentPost = .init(from: parentPost)
+        } else {
+            self.parentPost = nil
+        }
     }
 }
 
