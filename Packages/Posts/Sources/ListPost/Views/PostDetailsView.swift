@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import Models
+import Env
 
 struct PostDetailsView: View {
     
@@ -27,12 +28,12 @@ struct PostDetailsView: View {
                 HStack {
                     HStack(spacing: 3) {
                         Image(systemName: "arrow.up")
-                        Text(String(describing: post.postScore))
+                        Text(post.postScore.toFriendly())
                             .fixedSize()
                     }
                     HStack(spacing: 3) {
                         Image(systemName: "message")
-                        Text(String(describing: post.postCommentCount))
+                        Text(post.postCommentCount.toFriendly())
                             .fixedSize()
                     }
                     HStack(spacing: 3) {

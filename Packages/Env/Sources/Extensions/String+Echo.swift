@@ -35,4 +35,8 @@ extension String {
         }
         return nil
     }
+    
+    func friendly(num: Int) -> String {
+        return num.formatted(.number.grouping(.automatic).sign(strategy: .always()))
+    }
 }
