@@ -9,6 +9,7 @@ import SwiftUI
 import Env
 import User
 import Subreddits
+import Posts
 
 extension View {
     
@@ -21,6 +22,10 @@ extension View {
                 SubredditPage(subredditName: subredditName)
             case .subreddits:
                 SubredditListPage()
+            case let .postId(id):
+                PostView(postId: id)
+            case let .post(post):
+                PostView(with: post)
             }
         }
     }

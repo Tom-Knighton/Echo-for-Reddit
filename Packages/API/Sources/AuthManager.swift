@@ -8,7 +8,6 @@
 import Foundation
 import OAuthSwift
 import AuthenticationServices
-import Env
 
 @MainActor
 public class AuthManager: NSObject {

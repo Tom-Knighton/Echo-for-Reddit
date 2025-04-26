@@ -21,7 +21,8 @@ let package = Package(
         .package(path: "API"),
         .package(path: "Env"),
         .package(path: "Design"),
-        .package(path: "Models")
+        .package(path: "Models"),
+        .package(url: "https://github.com/Tom-Knighton/RedditMarkdownView.git", .upToNextMajor(from: "0.1.4"))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -37,7 +38,8 @@ let package = Package(
                 "API",
                 "Env",
                 "Design",
-                "Models"
+                "Models",
+                "RedditMarkdownView"
             ]),
         
     ]

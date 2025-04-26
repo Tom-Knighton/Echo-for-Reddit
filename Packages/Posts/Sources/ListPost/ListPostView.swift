@@ -39,7 +39,9 @@ public struct ListPostView: View {
                 }
                 
                 if let post = store.post {
-                    postView(for: post)
+                    NavigationLink(value: RouterDestination.post(post)) {
+                        postView(for: post)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
