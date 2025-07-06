@@ -10,4 +10,6 @@ import SwiftUI
 public extension EnvironmentValues {
     @Entry var theme: Theme = EchoLightTheme()    
     @Entry var linkManager: LPMetadataManager = LPMetadataManager()
+    
+    @Entry var postNavNamespace: Namespace.ID = Namespace().wrappedValue
 }

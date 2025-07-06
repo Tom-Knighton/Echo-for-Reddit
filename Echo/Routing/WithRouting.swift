@@ -13,7 +13,8 @@ import Posts
 
 extension View {
     
-    public func withEchoRoutes() -> some View {
+    
+    public func withEchoRoutes(postNavNamespace: Namespace.ID) -> some View {
         navigationDestination(for: RouterDestination.self) { destination in
             switch destination {
             case let .profile(username):
@@ -26,6 +27,9 @@ extension View {
                 PostView(postId: id)
             case let .post(post):
                 PostView(with: post)
+//                    .navigationTransition(
+//                        .zoom(sourceID: post.id, in: postNavNamespace)
+//                    )
             }
         }
     }

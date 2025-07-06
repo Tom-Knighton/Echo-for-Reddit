@@ -12,7 +12,10 @@ import Models
 import Env
 @preconcurrency import LinkPresentation
 
+@MainActor
 public struct ListPostView: View {
+    @Environment(\.postNavNamespace) private var postNavNamespace
+    @Namespace private var backupNamespace
     
     @Environment(\.theme) private var theme
     @Environment(\.linkManager) private var linkManager
@@ -41,19 +44,13 @@ public struct ListPostView: View {
                 if let post = store.post {
                     NavigationLink(value: RouterDestination.post(post)) {
                         postView(for: post)
+                            .matchedTransitionSource(id: post.id, in: postNavNamespace ?? backupNamespace)
                     }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isCrossPost ? theme.layer2 : theme.primaryBackground)
             .fontDesign(.rounded)
             .clipShape(.rect(cornerRadius: isCrossPost ? 10 : 0))
-            
-            if !isCrossPost {
-                Rectangle()
-                    .fill(theme.layer2)
-                    .frame(height: 12)
-            }
         }
     }
     
@@ -97,10 +94,18 @@ public struct ListPostView: View {
             PostDetailsView(post, isCrossPost: isCrossPost)
 
         }
+        .padding(.all, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 12)
+        .background(theme.layer2)
+        .clipShape(.rect(cornerRadius: 20))
         .multilineTextAlignment(.leading)
+        .scenePadding()
+    }
+}
+
+extension ListPostView: @MainActor Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.store.post == rhs.store.post
     }
 }
 
@@ -111,17 +116,30 @@ public struct ListPostView: View {
     
     let theme: any Theme = colorScheme == .dark ? EchoDarkTheme() : EchoLightTheme()
     
-    ZStack {
-        ScrollView {
-            VStack(spacing: 0) {
+    NavigationStack {
+        ZStack {
+            List {
                 ListPostView(with: post)
+                    .listRowInsets(.all, 0)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 ListPostView(with: post)
+                    .listRowInsets(.all, 0)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
                 ListPostView(with: post)
+                    .listRowInsets(.all, 0)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
             }
+            .navigationTitle("Posts")
+            .navigationSubtitle("Posts!")
+            .navigationLinkIndicatorVisibility(.hidden)
+            .listStyle(.plain)
+            .listRowSpacing(8)
+            .scrollContentBackground(.hidden)
+            .background(theme.primaryBackground)
         }
-        .listStyle(.plain)
-        .listRowSpacing(8)
-        .scrollContentBackground(.hidden)
     }
     .environment(\.theme, theme)
 }

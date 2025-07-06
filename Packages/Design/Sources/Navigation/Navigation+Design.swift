@@ -11,25 +11,25 @@ import CoreImage.CIFilterBuiltins
 public extension View {
     
     @ViewBuilder
-    func customNavigation(subtitle: String? = nil) -> some View {
+    func customNavigation(title: String, subtitle: String? = nil) -> some View {
         overlay(content: {
-            CustomNavigationTitleView<EmptyView>(subtitle: subtitle)
+            CustomNavigationTitleView<EmptyView>(title: title, subtitle: subtitle)
                 .frame(width: 0, height: 0)
         })
     }
     
     @ViewBuilder
-    func customNavigation<Content: View>(@ViewBuilder with rightIcon: @escaping () -> Content, subtitle: String? = nil) -> some View {
+    func customNavigation<Content: View>(@ViewBuilder with rightIcon: @escaping () -> Content, title: String, subtitle: String? = nil) -> some View {
         overlay(content: {
-            CustomNavigationTitleView(rightIcon: rightIcon, subtitle: subtitle)
+            CustomNavigationTitleView(title: title, rightIcon: rightIcon, subtitle: subtitle)
                 .frame(width: 0, height: 0)
         })
     }
     
     @ViewBuilder
-    func customNavigation<Content: View>(@ViewBuilder with rightIcon: @escaping () -> Content, backgroundUrl: String? = nil, subtitle: String? = nil) -> some View {
+    func customNavigation<Content: View>(@ViewBuilder with rightIcon: @escaping () -> Content, title: String, backgroundUrl: String? = nil, subtitle: String? = nil) -> some View {
         overlay(content: {
-            CustomNavigationTitleView(rightIcon: rightIcon, backgroundUrl: backgroundUrl, subtitle: subtitle)
+            CustomNavigationTitleView(title: title, rightIcon: rightIcon, backgroundUrl: backgroundUrl, subtitle: subtitle)
                 .frame(width: 0, height: 0)
         })
     }
@@ -38,10 +38,12 @@ public extension View {
 public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepresentable {
     
     public var rightIcon: (() -> RightIcon)? = nil
+    public var title: String
     public var subtitle: String? = nil
     public var backgroundUrl: String? = nil
     
-    public init(rightIcon: (() -> RightIcon)? = nil, backgroundUrl: String? = nil, subtitle: String? = nil) {
+    public init(title: String, rightIcon: (() -> RightIcon)? = nil, backgroundUrl: String? = nil, subtitle: String? = nil) {
+        self.title = title
         self.rightIcon = rightIcon
         self.subtitle = subtitle
         self.backgroundUrl = backgroundUrl
@@ -55,6 +57,7 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         private let partOne = ["X3NldExhcmdl", "VGl0bGVBY2Nlc3Nvcnk=", "Vmlldzo="]
         private let partTwo = ["X2FsaWduTGFyZ2VUaXQ=", "bGVBY2Nlc3Nvcnk=", "Vmlld1RvQmFzZWxpbmU="]
         private let partThree = ["X3NldA==", "V2VlVA==", "aXRsZTo="]
+        private let partFour = ["X19sYXJnZQ==", "VGl0bGVUd28=", "TGluZU1vZGU="]
         var rightContent: (() -> RightIcon)?
         var subtitle: String? = nil
         var backgroundUrl: String? = nil
@@ -69,6 +72,8 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
         override public func viewWillAppear(_ animated: Bool) {
             guard let navigationController = self.navigationController, let navigationItem = navigationController.visibleViewController?.navigationItem else { return }
             
+            self.title = title
+            
             if let rightContent {
                 let contentView = UIHostingController(rootView: rightContent())
                 contentView.view.backgroundColor = .clear
@@ -81,6 +86,7 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
             }
             
             let name2: [String] = partThree.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
+            let name3: [String] = partFour.compactMap { (try? Base64Decoder().decode($0)) ?? "" }
             
             var titleFont = UIFont.preferredFont(forTextStyle: .largeTitle)
             titleFont = UIFont(
@@ -110,33 +116,35 @@ public struct CustomNavigationTitleView<RightIcon: View>: UIViewControllerRepres
             coloredNavAppearance.largeTitleTextAttributes = [.font: titleFont]
             coloredNavAppearance.titleTextAttributes = [.font: smallTitleFont]
             
-            if let backgroundUrl, let url = URL(string: backgroundUrl) {
-                Task {
-                    let image = try? await ImageLoader.shared.loadImage(from: url)
-                    if let image {
-                        coloredNavAppearance.configureWithOpaqueBackground()
-                        coloredNavAppearance.backgroundImage = image
-                        coloredNavAppearance.backgroundImageContentMode = .scaleAspectFill
-                        let color = image.bestTextColor
-                        coloredNavAppearance.largeTitleTextAttributes = [.foregroundColor: color, .font: titleFont]
-                        navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
-                        
-                        if let searchField = navigationItem.searchController {
-                            searchField.searchBar.setPlaceholderColor(.gray)
-                            searchField.searchBar.searchTextField.leftView?.tintColor = .gray
-                            searchField.searchBar.searchTextField.textColor = color
-                        }
-                    }
-                }
-            } else {
-                coloredNavAppearance.configureWithTransparentBackground()
-                coloredNavAppearance.backgroundImage = nil
-                navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
-            }
+//            if let backgroundUrl, let url = URL(string: backgroundUrl) {
+//                Task {
+//                    let image = try? await ImageLoader.shared.loadImage(from: url)
+//                    if let image {
+//                        coloredNavAppearance.configureWithOpaqueBackground()
+//                        coloredNavAppearance.backgroundImage = image
+//                        coloredNavAppearance.backgroundImageContentMode = .scaleAspectFill
+//                        let color = image.bestTextColor
+//                        coloredNavAppearance.largeTitleTextAttributes = [.foregroundColor: color, .font: titleFont]
+//                        navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
+//                        
+//                        if let searchField = navigationItem.searchController {
+//                            searchField.searchBar.setPlaceholderColor(.gray)
+//                            searchField.searchBar.searchTextField.leftView?.tintColor = .gray
+//                            searchField.searchBar.searchTextField.textColor = color
+//                        }
+//                    }
+//                }
+//            } else {
+//                coloredNavAppearance.configureWithTransparentBackground()
+//                coloredNavAppearance.backgroundImage = nil
+//                navigationController.navigationBar.scrollEdgeAppearance = coloredNavAppearance
+//            }
             
             if let subtitle {
                 navigationItem.perform(Selector((name2.joined())), with: subtitle)
             }
+            
+            navigationItem.setValue(true, forKey: name3.joined())
             
             navigationController.navigationBar.prefersLargeTitles = true
             

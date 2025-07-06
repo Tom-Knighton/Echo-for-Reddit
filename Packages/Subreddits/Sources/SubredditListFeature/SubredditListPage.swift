@@ -49,7 +49,7 @@ public struct SubredditListPage: View {
             }
         }
         .navigationTitle("Subreddits")
-        .customNavigation()
+        .customNavigation(title: "Subreddits")
     }
     
     @ViewBuilder

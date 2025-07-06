@@ -68,17 +68,10 @@ public class SubredditCollectionViewController: UIViewController, UICollectionVi
     public init(theme: Theme, initialPosts: [Post]) {
         self.theme = theme
         super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
+        
         let uiCollectionView = self.configureCollectionView()
         uiCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        uiCollectionView.contentInsetAdjustmentBehavior = .always
         
         view.addSubview(uiCollectionView)
         self.collectionView = uiCollectionView
@@ -92,6 +85,15 @@ public class SubredditCollectionViewController: UIViewController, UICollectionVi
             uiCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             uiCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
         ])
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
     }
     
     func configureCollectionView() -> UICollectionView {
@@ -130,9 +132,9 @@ public class SubredditCollectionViewController: UIViewController, UICollectionVi
     public func updateTheme(to theme: Theme) {
         UIView.performWithoutAnimation {
             self.theme = theme
-            self.view.backgroundColor = .red
+            self.view.backgroundColor = .clear
             collectionView?.backgroundView = nil
-            collectionView?.backgroundColor = UIColor.red
+            collectionView?.backgroundColor = UIColor.clear
             
             collectionView?.collectionViewLayout = configureLayout()
             collectionView?.reloadData()

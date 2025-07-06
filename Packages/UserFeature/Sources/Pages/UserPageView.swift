@@ -69,7 +69,7 @@ public struct UserPageView: View {
                         }
                     }
                 }
-            }, subtitle: getUserSubtitle(for: user, with: subreddit))
+            }, title: getUserTitle(for: user, subreddit: subreddit), subtitle: getUserSubtitle(for: user, with: subreddit))
         }
     }
     

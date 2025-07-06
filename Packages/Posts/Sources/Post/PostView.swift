@@ -36,7 +36,7 @@ public struct PostView: View {
         }
         .navigationTitle("0 Comments")
         .navigationBarTitleDisplayMode(.inline)
-        .customNavigation()
+        .customNavigation(title: "0 Comments")
     }
     
     @ViewBuilder

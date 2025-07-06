@@ -12,6 +12,7 @@ import Subreddits
 
 struct AppTabRootView: View {
     @Environment(Router.self) private var router
+    @Environment(\.postNavNamespace) private var postNavNamespace
     
     let tab: AppTab
     
@@ -21,7 +22,7 @@ struct AppTabRootView: View {
         GeometryReader { _ in
             NavigationStack(path: $router[tab]) {
                 tab.rootView
-                    .withEchoRoutes()
+                    .withEchoRoutes(postNavNamespace: postNavNamespace)
             }
         }
         .ignoresSafeArea()

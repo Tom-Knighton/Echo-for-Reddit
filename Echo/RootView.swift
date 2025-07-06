@@ -12,6 +12,8 @@ import User
 import Env
 
 struct RootView: View {
+    
+    @Namespace private var postNavNamespace
     @State private var router: Router = .init()
     
     var body: some View {
@@ -23,7 +25,9 @@ struct RootView: View {
                 }
             }
         }
+        .tabBarMinimizeBehavior(.onScrollDown)
         .environment(router)
+        .environment(\.postNavNamespace, postNavNamespace)
     }
 }
 

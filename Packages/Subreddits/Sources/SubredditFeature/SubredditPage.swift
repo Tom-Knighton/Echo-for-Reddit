@@ -39,8 +39,9 @@ public struct SubredditPage: View {
                 subredditView(for: subreddit)
             }
         }
-        .navigationTitle(store.state.subredditData?.subredditTitle ?? "")
-        .navigationBarTitleDisplayMode(.large)
+        .ignoresSafeArea(.container, edges: [.bottom])
+        .navigationTitle(store.state.subredditData?.subredditName ?? "")
+        .navigationSubtitle(store.state.subredditData?.subredditTitle ?? "")
         .task {
             store.send(.fetchInitialData(subredditName: subredditName))
         }
@@ -50,26 +51,38 @@ public struct SubredditPage: View {
     
     @ViewBuilder
     private func subredditView(for subreddit: Subreddit) -> some View {
-        SubredditCollectionView(with: store)
-            .ignoresSafeArea()
-            .searchable(text: $search)
-            .customNavigation(with: {
-                if let avatarURL = URL(string: subreddit.subredditIconUrl ?? "") {
-                    AsyncImage(url: avatarURL) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .frame(width: 44, height: 44)
-                                .scaledToFit()
-                                .clipShape(Circle())
-                                .shadow(radius: 3)
-                        default:
-                            Circle()
-                                .fill(Color.gray)
-                        }
+        List {
+            ForEach(store.posts) { post in
+                ListPostView(with: post)
+                    .equatable()
+                    .id(post.postId)
+                    .listRowInsets(.all, 0)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+            }
+        }
+        .navigationLinkIndicatorVisibility(.hidden)
+        .listStyle(.plain)
+        .listRowSpacing(4)
+        .background(theme.primaryBackground)
+        .scrollContentBackground(.hidden)
+        .customNavigation(with: {
+            if let avatarURL = URL(string: subreddit.subredditIconUrl ?? "") {
+                AsyncImage(url: avatarURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .frame(width: 44, height: 44)
+                            .scaledToFit()
+                            .clipShape(Circle())
+                            .shadow(radius: 3)
+                    default:
+                        Circle()
+                            .fill(Color.gray)
                     }
                 }
-            }, backgroundUrl: subreddit.bannerImageUrl)        
+            }
+        }, title: store.state.subredditData?.subredditName ?? "", backgroundUrl: subreddit.bannerImageUrl)
     }
 }
