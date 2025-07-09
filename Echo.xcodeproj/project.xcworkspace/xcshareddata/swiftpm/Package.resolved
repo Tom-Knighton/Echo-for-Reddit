@@ -1,5 +1,5 @@
 {
-  "originHash" : "f265a95bd8f3983890b2b458c789e85bccb784c44d2e2e10e3d0f39b542992b3",
+  "originHash" : "75feb065a3835af13bce607cf8152a043c90aa3236b3594df7115648762ef325",
   "pins" : [
     {
       "identity" : "apollo-ios",
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Tom-Knighton/RedditMarkdownView.git",
       "state" : {
-        "revision" : "c29bfea25cb7a0759e823673b2aced6d431013fa",
-        "version" : "0.1.4"
+        "revision" : "acec3e6c5693208f6c93f041c90407b3d121cb2d",
+        "version" : "0.1.5"
       }
     },
     {

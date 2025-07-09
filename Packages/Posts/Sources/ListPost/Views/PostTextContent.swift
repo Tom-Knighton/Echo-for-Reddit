@@ -8,6 +8,7 @@
 import SwiftUI
 import Models
 import Env
+import RedditMarkdownView
 
 public struct PostTextContent: View {
     
@@ -16,8 +17,14 @@ public struct PostTextContent: View {
     
     public var body: some View {
         Spacer().frame(height: 4)
-        Text(textContent.truncate(length: 150))
+        
+        SnudownView(text: textContent)
+            .snudownTextColor(Color.gray)
+            .snudownDisplayInlineImages(false)
+            .snudownShowInlineImageLinks(false)
+            .snudownHideTables(true)
+            .snudownMaxCharacters(150)
+            .lineLimit(5)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(theme.labelColor.secondary)
     }
 }

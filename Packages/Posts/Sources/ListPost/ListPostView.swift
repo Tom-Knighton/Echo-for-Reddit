@@ -44,7 +44,7 @@ public struct ListPostView: View {
                 if let post = store.post {
                     NavigationLink(value: RouterDestination.post(post)) {
                         postView(for: post)
-                            .matchedTransitionSource(id: post.id, in: postNavNamespace ?? backupNamespace)
+//                            .matchedTransitionSource(id: post.id, in: postNavNamespace ?? backupNamespace)
                     }
                 }
             }
@@ -99,7 +99,7 @@ public struct ListPostView: View {
         .background(theme.layer2)
         .clipShape(.rect(cornerRadius: 20))
         .multilineTextAlignment(.leading)
-        .scenePadding()
+        .scenePadding(.horizontal)
     }
 }
 
@@ -136,7 +136,7 @@ extension ListPostView: @MainActor Equatable {
             .navigationSubtitle("Posts!")
             .navigationLinkIndicatorVisibility(.hidden)
             .listStyle(.plain)
-            .listRowSpacing(8)
+            .listRowSpacing(4)
             .scrollContentBackground(.hidden)
             .background(theme.primaryBackground)
         }

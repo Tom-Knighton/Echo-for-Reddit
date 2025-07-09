@@ -63,7 +63,7 @@ public struct SubredditPage: View {
         }
         .navigationLinkIndicatorVisibility(.hidden)
         .listStyle(.plain)
-        .listRowSpacing(4)
+        .listRowSpacing(8)
         .background(theme.primaryBackground)
         .scrollContentBackground(.hidden)
         .customNavigation(with: {
