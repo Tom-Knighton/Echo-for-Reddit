@@ -98,15 +98,18 @@ public struct OGLinkView: View {
     private func image() -> some View {
         Group {
             ZStack {
-                Rectangle()
-                    .fill(Color.secondary)
-                    .frame(height: 200)
-                    .opacity(uiImage == nil ? 1 : 1)
+                if uiImage == nil {
+                    Rectangle()
+                        .fill(Color.secondary)
+                        .frame(height: 200)
+                        .opacity(uiImage == nil ? 1 : 1)
+                }
                 if let uiImage {
                     Image(uiImage: uiImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(maxHeight: 200, alignment: .bottom)
+                        .frame(maxWidth: .infinity, maxHeight: 200)
+                        .clipped()
                         .transition(.identity)
                         .animation(nil, value: uiImage)
                         .transaction { transaction in

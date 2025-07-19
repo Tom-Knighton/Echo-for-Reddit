@@ -90,6 +90,10 @@ public struct ListPostView: View {
                         }
                 }
             }
+            
+            if post.postContent.contentType == .image || post.postContent.contentType == .mediaGallery {
+                PostImagesView(with: post.postContent)
+            }
            
             PostDetailsView(post, isCrossPost: isCrossPost)
 

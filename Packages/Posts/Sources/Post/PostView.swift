@@ -5,6 +5,8 @@
 //  Created by Tom Knighton on 11/04/2025.
 //
 
+import Design
+import Env
 import SwiftUI
 import ComposableArchitecture
 import Models
@@ -12,6 +14,7 @@ import RedditMarkdownView
 
 public struct PostView: View {
 
+    @Environment(\.theme) private var theme
     @State var store: StoreOf<PostFeature>
     
     public init(postId: String) {
@@ -25,7 +28,9 @@ public struct PostView: View {
     }
 
     public var body: some View {
-        VStack {
+        ZStack {
+            theme.primaryBackground.ignoresSafeArea()
+            
             if store.isLoading {
                 ProgressView()
             }
@@ -34,18 +39,28 @@ public struct PostView: View {
                 postView(post)
             }
         }
-        .navigationTitle("0 Comments")
-        .navigationBarTitleDisplayMode(.inline)
-        .customNavigation(title: "0 Comments")
     }
     
     @ViewBuilder
     private func postView(_ post: Post) -> some View {
-        PostCollectionView(post: post)
+        List {
+            PostContentView(post: post)
+                .listRowInsets(.all, 0)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 }
 
 #Preview {
-    PostView(postId: "test")
+    @Previewable @Environment(\.colorScheme) var colorScheme
+    let theme: any Theme = colorScheme == .dark ? EchoDarkTheme() : EchoLightTheme()
+
+    NavigationStack {
+        PostView(with: Post(postId: "1", cursorId: "1", postAuthor: "SomeRedditUser", postAuthorFlair: nil, postSubreddit: "UKPolitics", postTitle: "Wow! TIL You could make a Reddit app smelly smelly smelly smelly...", postScore: 100, postScorePercentage: 100, postCommentCount: 100, postCreatedAt: Date(), postEditedAt: nil, subredditIcon: nil, postFlagDetails: .init(isNSFW: false, isSaved: false, isLocked: false, isStickied: false, isArchived: false, isSpoiler: false), postContent: .init(textContent: "Some content...", contentType: .textOnly, media: []), postVoteStatus: .noVote, postFlair: "Some flair", postRecommendedSort: .best, parentPost: Post(postId: "1", cursorId: "1", postAuthor: "SomeRedditUser", postAuthorFlair: nil, postSubreddit: "UKPolitics", postTitle: "Wow! TIL You could make a Reddit app smelly smelly smelly smelly...", postScore: 100, postScorePercentage: 100, postCommentCount: 100, postCreatedAt: Date(), postEditedAt: nil, subredditIcon: nil, postFlagDetails: .init(isNSFW: false, isSaved: false, isLocked: false, isStickied: false, isArchived: false, isSpoiler: false), postContent: .init(textContent: "Some content...", contentType: .textOnly, media: []), postVoteStatus: .noVote, postFlair: "Some flair", postRecommendedSort: .best)))
+    }
+    .environment(\.theme, theme)
         
 }

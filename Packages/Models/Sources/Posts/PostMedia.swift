@@ -27,4 +27,6 @@ public struct PostMedia {
     }
 }
 
-extension PostMedia: Equatable, Sendable {}
+extension PostMedia: Equatable, Sendable, Identifiable {
+    public var id: String { url }
+}

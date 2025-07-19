@@ -196,7 +196,7 @@ actor ImageLoader {
     static let shared = ImageLoader()
     private let cache = NSCache<NSURL, UIImage>()
     
-    func loadImage(from url: URL) async throws -> UIImage {
+    func loadImage(from url: URL, downsample: Bool = true) async throws -> UIImage {
         if let cachedImage = cache.object(forKey: url as NSURL) {
             return cachedImage
         }
@@ -212,7 +212,7 @@ actor ImageLoader {
             throw URLError(.cannotDecodeContentData)
         }
         
-        if let downsampled = resizedImageWith(image: image, targetSize: .init(width: 100, height: 150)) {
+        if downsample, let downsampled = resizedImageWith(image: image, targetSize: .init(width: 100, height: 150)) {
             image = downsampled
         }
         

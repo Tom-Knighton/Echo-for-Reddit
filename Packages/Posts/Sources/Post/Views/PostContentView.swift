@@ -38,6 +38,8 @@ public struct PostContentView: View {
                     .snudownFont(for: .h5, .callout)
                     .snudownFont(for: .h6, .body)
                     .snudownDisplayInlineImages(false)
+                    .snudownTextAlignment(.leading)
+                    .snudownMultilineAlignment(.leading)
             default:
                 EmptyView()
             }

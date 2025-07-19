@@ -39,6 +39,7 @@ public struct SubredditListPage: View {
                             listRow(for: subreddit)
                         }
                     }
+                    .sectionIndexLabel(key)
                 }
             }
             .scrollContentBackground(.hidden)
